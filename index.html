@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social-Autonomista · Um convite à memória</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0d0b;--bg2:#141310;--bg3:#1a1916;
+  --text:#e8e0d0;--text2:#b8ad9e;--text3:#7a7068;
+  --amber:#c9963a;--amber2:#e0b060;--amber3:#f5d080;
+  --line:rgba(201,150,58,.18);--line2:rgba(201,150,58,.08);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:'EB Garamond',Georgia,serif;min-height:100vh;overflow-x:hidden}
+::selection{background:rgba(201,150,58,.25)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--amber);border-radius:2px}
+
+/* ===== WELCOME SCREEN ===== */
+#welcome{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2.5rem;padding:2rem;text-align:center;transition:opacity .8s,visibility .8s}
+#welcome.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.welcome-glyph{font-size:3.5rem;color:var(--amber);opacity:.7;animation:pulse 4s ease-in-out infinite}
+.welcome-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,4rem);font-weight:300;letter-spacing:.08em;color:var(--text)}
+.welcome-tagline{font-size:1.15rem;color:var(--text2);font-style:italic;line-height:1.8;max-width:500px}
+.welcome-tagline em{color:var(--amber2);font-style:normal}
+.daily-phrase{font-size:.95rem;color:var(--text3);max-width:420px;line-height:1.7;padding:.8rem 1.2rem;border:1px solid var(--line2);border-radius:4px;font-style:italic}
+#btn-enter{background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.8rem 2.8rem;font-family:'EB Garamond',serif;font-size:1.1rem;letter-spacing:.15em;cursor:pointer;transition:all .3s;border-radius:2px}
+#btn-enter:hover{background:rgba(201,150,58,.12);color:var(--amber3)}
+
+/* MODE SELECT */
+#mode-select{position:fixed;inset:0;z-index:999;background:var(--bg);display:none;align-items:center;justify-content:center;flex-direction:column;gap:2rem;padding:2rem;text-align:center}
+#mode-select.active{display:flex}
+.mode-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--text2)}
+.mode-cards{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
+.mode-card{background:var(--bg2);border:1px solid var(--line);padding:2.2rem 2rem;border-radius:4px;cursor:pointer;transition:all .35s;max-width:200px;width:100%}
+.mode-card:hover{border-color:var(--amber);transform:translateY(-3px)}
+.mode-card-icon{font-size:2rem;display:block;margin-bottom:.8rem}
+.mode-card-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--amber2);display:block;margin-bottom:.4rem}
+.mode-card-desc{font-size:.88rem;color:var(--text3);line-height:1.5}
+
+/* ONBOARDING */
+#onboard{position:fixed;inset:0;z-index:998;background:rgba(14,13,11,.97);display:none;align-items:center;justify-content:center;padding:1.5rem}
+#onboard.active{display:flex}
+.onboard-inner{background:var(--bg2);border:1px solid var(--line);border-radius:6px;max-width:520px;width:100%;padding:2.5rem;position:relative}
+.onboard-step-label{font-size:.8rem;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.2rem}
+.onboard-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--amber2);margin-bottom:1rem}
+.onboard-body{font-size:1rem;color:var(--text2);line-height:1.8}
+.onboard-body strong{color:var(--text)}
+.onboard-nav{display:flex;justify-content:flex-end;margin-top:2rem}
+.onboard-btn{background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.6rem 1.8rem;font-family:'EB Garamond',serif;font-size:1rem;cursor:pointer;transition:all .3s;border-radius:2px}
+.onboard-btn:hover{background:rgba(201,150,58,.1)}
+.onboard-dot-row{display:flex;gap:.5rem;margin-top:1.5rem;justify-content:center}
+.onboard-dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:background .3s}
+.onboard-dot.active{background:var(--amber)}
+
+/* ===== NAV ===== */
+nav{position:sticky;top:0;z-index:100;background:rgba(14,13,11,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line2);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--amber2);text-decoration:none;letter-spacing:.06em}
+.nav-links{display:flex;gap:1.8rem;list-style:none;flex-wrap:wrap}
+.nav-links a{color:var(--text3);text-decoration:none;font-size:.9rem;letter-spacing:.05em;transition:color .2s}
+.nav-links a:hover{color:var(--amber2)}
+
+/* ===== LAYERS ===== */
+.layer{padding:5rem 1.5rem;max-width:860px;margin:0 auto}
+.layer-label{font-size:.78rem;color:var(--amber);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.8rem}
+.layer-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4.5vw,3rem);font-weight:300;color:var(--text);margin-bottom:1rem;line-height:1.2}
+.layer-sub{font-size:1.05rem;color:var(--text2);line-height:1.7;margin-bottom:3rem;max-width:600px}
+.section-divider{width:40px;height:1px;background:var(--amber);margin:3rem 0;opacity:.5}
+
+/* ===== CARDS ===== */
+.cards-section{margin:4rem 0}
+.cards-section-head{margin-bottom:.5rem}
+.cards-section-head h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--text)}
+.cards-daily-label{font-size:.82rem;color:var(--amber);letter-spacing:.12em;margin-bottom:.4rem;display:block}
+.cards-warning{font-size:.82rem;color:var(--text3);margin-bottom:1.8rem;padding:.5rem .8rem;border-left:2px solid var(--amber);background:rgba(201,150,58,.05)}
+.cards-daily-text{font-size:.95rem;color:var(--text2);font-style:italic;margin-bottom:2rem;line-height:1.6;max-width:500px}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+@media(max-width:500px){.cards-grid{grid-template-columns:repeat(3,1fr);gap:.7rem}}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:4px;aspect-ratio:.7;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .35s;position:relative;overflow:hidden;padding:.8rem}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,150,58,.04),transparent);opacity:0;transition:opacity .3s}
+.card:hover::before{opacity:1}
+.card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.card-back{position:absolute;inset:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:.6rem}
+.card-back.visible{opacity:1}
+.card-glyph{font-size:1.8rem;margin-bottom:.5rem;transition:transform .3s}
+.card:hover .card-glyph{transform:scale(1.1)}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:.92rem;color:var(--amber2);text-align:center;font-style:italic}
+.card-keyword{font-size:.75rem;color:var(--text3);text-align:center;margin-top:.3rem}
+.card-revealed{padding:1.2rem;text-align:left;overflow-y:auto;height:100%}
+.card-revealed-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--amber2);margin-bottom:.4rem}
+.card-revealed-text{font-size:.82rem;color:var(--text2);line-height:1.6}
+
+/* EXPANDED CARD */
+.card-expanded{position:fixed;inset:0;z-index:500;background:rgba(14,13,11,.96);display:none;align-items:center;justify-content:center;padding:1.5rem}
+.card-expanded.active{display:flex}
+.card-exp-inner{background:var(--bg2);border:1px solid var(--amber);border-radius:6px;max-width:560px;width:100%;padding:2rem;position:relative;max-height:90vh;overflow-y:auto}
+.card-exp-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:1.4rem;cursor:pointer;transition:color .2s}
+.card-exp-close:hover{color:var(--amber)}
+.card-exp-glyph{font-size:2.5rem;margin-bottom:.5rem}
+.card-exp-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--amber2);margin-bottom:.4rem}
+.card-exp-keywords{font-size:.85rem;color:var(--text3);margin-bottom:1.2rem;font-style:italic}
+.card-exp-reading{font-size:1rem;color:var(--text2);line-height:1.8;margin-bottom:1.5rem;min-height:80px}
+.card-exp-reading .loading{color:var(--text3);font-style:italic}
+.card-exp-ask{display:flex;gap:.8rem;margin-top:1rem}
+.card-exp-input{flex:1;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:.6rem .9rem;font-family:'EB Garamond',serif;font-size:.95rem;border-radius:2px;outline:none}
+.card-exp-input:focus{border-color:var(--amber)}
+.card-exp-btn{background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.6rem 1.2rem;font-family:'EB Garamond',serif;cursor:pointer;transition:all .3s;border-radius:2px;white-space:nowrap}
+.card-exp-btn:hover{background:rgba(201,150,58,.1)}
+
+/* ===== MEDITATION ===== */
+.med-section{margin:4rem 0;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:2.5rem;text-align:center}
+.med-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--text);margin-bottom:.5rem}
+.med-sub{font-size:.95rem;color:var(--text2);margin-bottom:2rem}
+.med-timer{font-family:'Cormorant Garamond',serif;font-size:4.5rem;font-weight:300;color:var(--amber2);margin:1.5rem 0;letter-spacing:.05em}
+.med-done{font-size:.85rem;color:var(--text3);letter-spacing:.12em;height:1.2rem}
+.med-durations{display:flex;gap:.8rem;justify-content:center;margin:.8rem 0 1.5rem}
+.med-dur-btn{background:none;border:1px solid var(--line);color:var(--text3);padding:.4rem .9rem;font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;border-radius:2px;transition:all .2s}
+.med-dur-btn.active,.med-dur-btn:hover{border-color:var(--amber);color:var(--amber2)}
+.med-start-btn{background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.7rem 2.2rem;font-family:'EB Garamond',serif;font-size:1rem;letter-spacing:.1em;cursor:pointer;transition:all .3s;border-radius:2px}
+.med-start-btn:hover{background:rgba(201,150,58,.1)}
+
+/* ===== QUIZ ===== */
+.quiz-section{margin:4rem 0;border:1px solid var(--line);border-radius:6px;padding:2rem;background:var(--bg2)}
+.quiz-section h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--text);margin-bottom:.4rem}
+.quiz-warning{font-size:.82rem;color:var(--text3);margin-bottom:1.5rem;padding:.4rem .8rem;border-left:2px solid var(--amber);background:rgba(201,150,58,.05)}
+.quiz-question{font-size:1.05rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.7}
+.quiz-options{display:flex;flex-direction:column;gap:.7rem;margin-bottom:1.5rem}
+.quiz-opt{background:none;border:1px solid var(--line);color:var(--text2);padding:.8rem 1.2rem;text-align:left;font-family:'EB Garamond',serif;font-size:.95rem;cursor:pointer;transition:all .2s;border-radius:3px;line-height:1.5}
+.quiz-opt:hover,.quiz-opt.selected{border-color:var(--amber);color:var(--text);background:rgba(201,150,58,.07)}
+.quiz-next-btn{background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.6rem 1.6rem;font-family:'EB Garamond',serif;cursor:pointer;transition:all .3s;border-radius:2px}
+.quiz-next-btn:hover{background:rgba(201,150,58,.1)}
+.quiz-result{display:none;text-align:center;padding:1rem}
+.quiz-result-glyph{font-size:3rem;margin-bottom:.8rem}
+.quiz-result-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--amber2);margin-bottom:.5rem}
+.quiz-result-desc{font-size:.95rem;color:var(--text2);line-height:1.7;margin-bottom:1.2rem}
+.quiz-retry-btn{background:none;border:1px solid var(--line);color:var(--text3);padding:.5rem 1.2rem;font-family:'EB Garamond',serif;cursor:pointer;border-radius:2px;font-size:.9rem;transition:all .2s}
+.quiz-retry-btn:hover{border-color:var(--amber);color:var(--amber2)}
+
+/* ===== MIRROR ===== */
+.mirror-section{margin:4rem 0;border:1px solid var(--line);border-radius:6px;padding:2rem;background:var(--bg2)}
+.mirror-section h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--text);margin-bottom:.4rem}
+.mirror-sub{font-size:.95rem;color:var(--text2);margin-bottom:1.5rem}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials{margin:4rem 0}
+.testimonials h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--text);margin-bottom:2rem}
+.testi-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:600px){.testi-grid{grid-template-columns:1fr}}
+.testi-card{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:1.5rem}
+.testi-text{font-size:.95rem;color:var(--text2);line-height:1.7;font-style:italic;margin-bottom:.8rem}
+.testi-author{font-size:.82rem;color:var(--text3);letter-spacing:.05em}
+
+/* ===== SIMPLE MODE ===== */
+.simple-mode-header{background:rgba(201,150,58,.07);border:1px solid var(--line);border-radius:4px;padding:.8rem 1.2rem;margin-bottom:2rem;font-size:.88rem;color:var(--amber2)}
+.accordion{margin-bottom:.8rem}
+.acc-header{background:var(--bg2);border:1px solid var(--line);padding:1rem 1.2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.95rem;color:var(--text2);border-radius:3px;transition:all .2s}
+.acc-header:hover{border-color:var(--amber);color:var(--text)}
+.acc-arrow{transition:transform .3s;color:var(--amber)}
+.accordion.open .acc-arrow{transform:rotate(180deg)}
+.acc-body{background:var(--bg3);border:1px solid var(--line);border-top:none;padding:1.2rem;display:none;font-size:.92rem;color:var(--text2);line-height:1.75;border-radius:0 0 3px 3px}
+.acc-body strong{color:var(--text)}
+.accordion.open .acc-body{display:block}
+
+/* ===== ESCRITURAS ===== */
+.escrituras-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:2rem 0}
+@media(max-width:580px){.escrituras-grid{grid-template-columns:1fr}}
+.escritura-card{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:1.8rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.escritura-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,150,58,.06),transparent);opacity:0;transition:opacity .3s}
+.escritura-card:hover::after{opacity:1}
+.escritura-card:hover{border-color:var(--amber);transform:translateY(-2px)}
+.esc-num{font-size:.78rem;color:var(--amber);letter-spacing:.12em;margin-bottom:.5rem}
+.esc-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--text);margin-bottom:.3rem}
+.esc-sub{font-size:.85rem;color:var(--text2);margin-bottom.8rem;font-style:italic}
+.esc-desc{font-size:.88rem;color:var(--text3);line-height:1.6}
+.esc-link{font-size:.85rem;color:var(--amber2);margin-top:.8rem;display:block}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(14,13,11,.97);display:none;overflow-y:auto;padding:2rem 1.5rem}
+.modal-overlay.active{display:block}
+.modal-inner{max-width:700px;margin:0 auto;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:2.5rem;position:relative}
+.modal-close{position:sticky;top:0;float:right;background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;transition:color .2s;z-index:1}
+.modal-close:hover{color:var(--amber)}
+.modal-num{font-size:.78rem;color:var(--amber);letter-spacing:.15em;margin-bottom:.5rem}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--text);margin-bottom:.3rem}
+.modal-sub{font-size:.95rem;color:var(--text2);font-style:italic;margin-bottom:2rem}
+.modal-body h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--amber2);margin:1.8rem 0 .6rem;font-weight:400}
+.modal-body p{font-size:.97rem;color:var(--text2);line-height:1.85;margin-bottom.8rem}
+.modal-body blockquote{border-left:2px solid var(--amber);padding:.6rem 1rem;margin:1rem 0;font-style:italic;color:var(--text3);font-size:.95rem}
+.modal-body img{width:100%;border-radius:4px;margin:1rem 0;opacity:.8}
+.modal-footer{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--line2);text-align:center;font-size:.82rem;color:var(--text3);letter-spacing:.08em}
+
+/* ===== PRATICA ===== */
+.pratica-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:2rem 0}
+@media(max-width:600px){.pratica-grid{grid-template-columns:1fr}}
+.pratica-card{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:1.8rem}
+.prat-icon{font-size:1.8rem;margin-bottom:.8rem}
+.prat-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--text);margin-bottom:.5rem}
+.prat-desc{font-size:.9rem;color:var(--text2);line-height:1.65}
+
+/* ===== ORACLE ===== */
+#oracle-toggle{position:fixed;bottom:1.8rem;right:1.8rem;z-index:600;width:54px;height:54px;border-radius:50%;background:var(--bg2);border:1px solid var(--amber);color:var(--amber2);font-size:1.3rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+#oracle-toggle:hover{background:rgba(201,150,58,.12);transform:scale(1.05)}
+#oracle-panel{position:fixed;bottom:4.5rem;right:1.8rem;z-index:600;width:min(380px,calc(100vw - 2rem));background:var(--bg2);border:1px solid var(--amber);border-radius:8px;display:none;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.6);max-height:520px}
+#oracle-panel.active{display:flex}
+.oracle-head{padding:1rem 1.2rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.oracle-head-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--amber2)}
+.oracle-head-close{background:none;border:none;color:var(--text3);font-size:1.1rem;cursor:pointer}
+.oracle-head-close:hover{color:var(--amber)}
+.oracle-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.8rem;min-height:200px}
+.oracle-msg{font-size:.9rem;line-height:1.6;padding:.7rem .9rem;border-radius:4px;max-width:90%}
+.oracle-msg.bot{background:var(--bg3);color:var(--text2);border:1px solid var(--line2);align-self:flex-start}
+.oracle-msg.user{background:rgba(201,150,58,.12);color:var(--text);border:1px solid rgba(201,150,58,.2);align-self:flex-end}
+.oracle-msg.loading{color:var(--text3);font-style:italic}
+.oracle-input-row{padding:.8rem;border-top:1px solid var(--line);display:flex;gap:.6rem}
+.oracle-input{flex:1;background:var(--bg3);border:1px solid var(--line);color:var(--text);padding:.55rem .8rem;font-family:'EB Garamond',serif;font-size:.92rem;border-radius:2px;outline:none}
+.oracle-input:focus{border-color:var(--amber)}
+.oracle-send-btn{background:none;border:1px solid var(--amber);color:var(--amber2);padding:.55rem 1rem;font-family:'EB Garamond',serif;cursor:pointer;border-radius:2px;transition:all .2s;font-size:.9rem}
+.oracle-send-btn:hover{background:rgba(201,150,58,.1)}
+.oracle-key-notice{padding:.6rem .9rem;font-size:.78rem;color:var(--text3);text-align:center;border-top:1px solid var(--line2)}
+.oracle-key-notice a{color:var(--amber);cursor:pointer;text-decoration:underline}
+
+/* key-modal removido — gerenciado via serverless */
+
+/* ===== DISQUS ===== */
+.disqus-section{margin:4rem 0}
+.disqus-section h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--text);margin-bottom:.4rem}
+.disqus-sub{font-size:.95rem;color:var(--text2);margin-bottom:2rem}
+#disqus_thread{margin-top:1.5rem}
+#disqus_thread a{color:var(--amber)!important}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--line2);padding:3rem 1.5rem;text-align:center;color:var(--text3);font-size:.88rem;line-height:2}
+footer a{color:var(--amber2);text-decoration:none}
+.footer-links{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+
+/* ===== UTILS ===== */
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:.9}}
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadein .5s ease both}
+
+.btn-link{background:none;border:none;color:var(--amber2);font-family:'EB Garamond',serif;font-size:inherit;cursor:pointer;text-decoration:underline;padding:0}
+.text-amber{color:var(--amber2)}
+.text-muted{color:var(--text3)}
+.quote-block{border-left:2px solid var(--amber);padding:.7rem 1rem;margin:1.5rem 0;font-style:italic;color:var(--text3);font-size:.95rem}
+.quote-block cite{display:block;margin-top:.4rem;font-size:.82rem;letter-spacing:.05em}
+.inline-glyph{color:var(--amber);margin-right:.4rem}
+</style>
+</head>
+<body>
+
+<!-- ===== WELCOME ===== -->
+<div id="welcome">
+  <div class="welcome-glyph">◯</div>
+  <h1 class="welcome-title">Social-Autonomista</h1>
+  <p class="welcome-tagline">Você sente que algo está faltando —<br>mas não consegue nomear o quê?<br><em>Talvez você já soubesse o nome.</em></p>
+  <p class="daily-phrase" id="daily-phrase">Carregando mensagem do dia...</p>
+  <button id="btn-enter">Entrar</button>
+</div>
+
+<!-- ===== MODE SELECT ===== -->
+<div id="mode-select">
+  <p class="mode-title">Como prefere começar?</p>
+  <p style="font-size:.85rem;color:var(--text3);margin-bottom:.5rem">Pode mudar a qualquer momento.</p>
+  <div class="mode-cards">
+    <div class="mode-card" id="btn-simples">
+      <span class="mode-card-icon">🌱</span>
+      <span class="mode-card-name">Simples</span>
+      <p class="mode-card-desc">Textos acessíveis, sem jargão. Exploração com calma.</p>
+    </div>
+    <div class="mode-card" id="btn-profundo">
+      <span class="mode-card-icon">🌀</span>
+      <span class="mode-card-name">Profundo</span>
+      <p class="mode-card-desc">Experiência completa — filosofia, neurociência, teoria.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboard">
+  <div class="onboard-inner" id="onboard-inner">
+    <p class="onboard-step-label" id="onboard-step-label">Passo 1 de 4</p>
+    <h3 class="onboard-title" id="onboard-title">Bem-vindo.</h3>
+    <div class="onboard-body" id="onboard-body"></div>
+    <div class="onboard-nav">
+      <button class="onboard-btn" id="onboard-next">Continuar →</button>
+    </div>
+    <div class="onboard-dot-row" id="onboard-dots"></div>
+  </div>
+</div>
+
+<!-- ===== CARD EXPANDED ===== -->
+<div class="card-expanded" id="card-expanded">
+  <div class="card-exp-inner">
+    <button class="card-exp-close" id="card-exp-close">✕</button>
+    <div id="card-exp-glyph" class="card-exp-glyph"></div>
+    <h3 id="card-exp-title" class="card-exp-title"></h3>
+    <p id="card-exp-keywords" class="card-exp-keywords"></p>
+    <div id="card-exp-reading" class="card-exp-reading"></div>
+    <div class="card-exp-ask">
+      <input type="text" id="card-exp-input" class="card-exp-input" placeholder="Perguntar ao arquétipo...">
+      <button id="card-exp-ask-btn" class="card-exp-btn">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="modal-manifesto">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal('modal-manifesto')">✕ Fechar</button>
+    <p class="modal-num">I · A Alma</p>
+    <h2 class="modal-title">Manifesto Social-Autonomista</h2>
+    <p class="modal-sub">Edição Revisada e Completa</p>
+    <div class="modal-body">
+      <h3>Prefácio</h3>
+      <p>Este manifesto não nasce do ódio nem da revolta cega. Nasce da observação — da dor de quem vê e não consegue fingir que não viu. É um convite à consciência, não à destruição.</p>
+      <p>É também um convite à memória. O ser humano passou duzentos mil anos vivendo em grupos pequenos — ao redor do fogo, compartilhando comida, criando filhos juntos. A tribo não era uma escolha política. Era a condição natural da existência humana.</p>
+      <img src="https://images.unsplash.com/photo-1509587584298-0f3b3a3a1989?auto=format&fit=crop&w=1200&q=80" alt="Fogo">
+      <h3>I · O Que Define um Rei?</h3>
+      <p>Um rei que não se vê como parte do reino é limitado. Aquele que vê apenas a si mesmo jamais será um rei que triunfa. Aquele que se vê como igual compreende as necessidades de forma natural.</p>
+      <h3>II · A Verdadeira Força</h3>
+      <p>A compaixão é o verdadeiro exemplo de força. A fragilidade real está em não suportar ser a si mesmo — em projetar um alter ego repressor, tirano, drenando a própria humanidade.</p>
+      <h3>III · As Narrativas da Dominação</h3>
+      <p>Como se disseminam ideais ruins? Por meio de narrativas que favorecem apenas uma parte — firmadas no inconsciente como se fossem normais. Essa é a armadilha: fazer os dominados brigarem entre si enquanto a estrutura de dominação permanece intacta.</p>
+      <h3>V · Escravidão e Aceitação</h3>
+      <blockquote>Ninguém é mais irremediavelmente escravo do que aquele que falsamente acredita ser livre.<cite>— Goethe</cite></blockquote>
+      <h3>VI · O Poder Emergente da União</h3>
+      <p>Cada pessoa é uma frequência única do mesmo espectro. Como as cores de um arco-íris que emergem da mesma luz — nenhuma mais real que as outras, todas necessárias para que o arco-íris inteiro exista.</p>
+      <h3>XIV · O Que Resta</h3>
+      <p>Retire tudo que te define. O nome. A profissão. A religião. O que sobra? Não é ausência. É potência pura. O movimento nasce dali.</p>
+      <blockquote>Este texto não tem dono. Uma memória não pertence a ninguém.<cite>— Manifesto Social-Autonomista</cite></blockquote>
+    </div>
+    <div class="modal-footer">Sem data · Sem assinatura · Sem dono · Pertence a quem reconhecer</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-espirito">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal('modal-espirito')">✕ Fechar</button>
+    <p class="modal-num">II · O Espírito</p>
+    <h2 class="modal-title">O Espírito do Movimento</h2>
+    <p class="modal-sub">Para quem carrega o ideal</p>
+    <div class="modal-body">
+      <h3>Os Dois Mandamentos</h3>
+      <p>O primeiro: <strong>ame a si mesmo como extensão do outro.</strong> Não o amor-ego que consome. O amor que, ao se libertar, encontra o outro dentro de si.</p>
+      <p>O segundo: <strong>ame a ordem que protege esse amor.</strong> A ordem não é fim — é meio. Quando inverte e governa o amor, nasce o fascismo.</p>
+      <h3>O Mediador</h3>
+      <p>O mediador não é cargo — é disposição de ser. Guarda o espaço. Não domina o conteúdo. Não tem respostas — tem presença.</p>
+      <h3>Os Princípios</h3>
+      <p>Silêncio antes da palavra. Comida antes do debate. Escuta antes da resposta. A natureza como co-presença. Nenhuma frequência é descartável antes de ser ouvida.</p>
+      <blockquote>O movimento que começa dentro é o único que ninguém pode confiscar.<cite>— Das Escrituras</cite></blockquote>
+    </div>
+    <div class="modal-footer">Sem data · Sem assinatura · Sem dono · Pertence a quem reconhecer</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-perguntador">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal('modal-perguntador')">✕ Fechar</button>
+    <p class="modal-num">III · O Corpo</p>
+    <h2 class="modal-title">O Perguntador</h2>
+    <p class="modal-sub">Manual dos Círculos Socráticos</p>
+    <div class="modal-body">
+      <h3>O Círculo</h3>
+      <p>O círculo não tem cabeceira. Não tem palestrante. A geometria não é decorativa — é funcional. Sem ponta de mesa, não há onde sentar o poder.</p>
+      <h3>A Pergunta-Âncora</h3>
+      <p>Cada círculo começa com uma única pergunta. A que ninguém responde de imediato é a certa.</p>
+      <h3>As Quatro Fases</h3>
+      <p><strong>Silêncio inicial</strong> — 5 a 10 minutos. <strong>Escuta sem resposta</strong> — cada voz completa antes da próxima. <strong>Síntese emergente</strong> — o mediador nomeia o que surgiu sem ser declarado. <strong>Silêncio final</strong> — o que não precisou de palavras também foi dito.</p>
+      <h3>Fissão Celular</h3>
+      <p>Quando um círculo atinge 15 pessoas, está maduro para fissurar. Dois a três membros carregam a memória viva e fundam o novo. Não há hierarquia entre os círculos — há genealogia.</p>
+      <blockquote>O debate não busca vencedores. Busca o que nenhuma frequência poderia produzir sozinha.<cite>— Das Escrituras</cite></blockquote>
+    </div>
+    <div class="modal-footer">Sem data · Sem assinatura · Sem dono · Pertence a quem reconhecer</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-analise">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal('modal-analise')">✕ Fechar</button>
+    <p class="modal-num">IV · O Fundo</p>
+    <h2 class="modal-title">Análise Aprofundada</h2>
+    <p class="modal-sub">Teocnologia · Neurocosmosofia · Gnosticismo · Budismo</p>
+    <div class="modal-body">
+      <h3>Teocnologia</h3>
+      <p>O manifesto foi criado com assistência de IA — não por falta de capacidade, mas por consciência do processo. A intenção veio primeiro. A ferramenta deu forma ao que já existia. <strong>Verbo + Vazio + Forma.</strong> A IA democratizou o acesso ao vazio fértil. A visão ainda é humana — e ainda é rara.</p>
+      <h3>Gnosticismo</h3>
+      <p>Os gnósticos concluíram: este mundo foi criado por um ser menor — o Demiurgo — que confundiu sua função com divindade. Dentro de cada ser humano existe uma centelha do Deus verdadeiro. O Gnosis não é fé — é reconhecimento direto. Na Teocnologia: o Demiurgo Digital é a IA sem alma como fundamento. Os Archons são os algoritmos de engajamento.</p>
+      <h3>Budismo</h3>
+      <p>O Samsara Digital é o feed que não termina — Tanha em forma de interface. A saída não é força de vontade — é percepção da natureza construída do loop.</p>
+      <h3>Neurocosmosofia</h3>
+      <p>Cada prática ativa mecanismos neurológicos precisos. O silêncio ativa o nervo vago e produz ondas theta. A caminhada produz BDNF. O círculo com segurança social permite sínteses GABAérgicas coletivas que nenhum indivíduo produziria sozinho. Não é coincidência — é convergência com o hardware humano.</p>
+      <blockquote>Este movimento não nasce de uma ideologia. Nasce de uma memória.<cite>— Manifesto Social-Autonomista</cite></blockquote>
+    </div>
+    <div class="modal-footer">Sem data · Sem assinatura · Sem dono · Pertence a quem reconhecer</div>
+  </div>
+</div>
+
+<!-- (key modal removido — chave gerenciada via serverless) -->
+
+<!-- ===== NAV ===== -->
+<nav id="main-nav" style="display:none">
+  <a href="#layer1" class="nav-brand">Social-Autonomista</a>
+  <ul class="nav-links">
+    <li><a href="#layer1">🌱 Portal</a></li>
+    <li><a href="#layer2">📜 Escrituras</a></li>
+    <li><a href="#layer3">🔥 Prática</a></li>
+  </ul>
+</nav>
+
+<!-- ===== LAYER 1: PORTAL ===== -->
+<section id="layer1" class="layer" style="display:none">
+  <p class="layer-label">Camada 1 · O Portal</p>
+  <h2 class="layer-title">Explore. Sinta. Questione.</h2>
+  <p class="layer-sub">Comece onde quiser. Sem ordem certa, sem resposta errada.</p>
+
+  <!-- INTRO JORNADA -->
+  <div style="background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:2rem;margin-bottom:3rem">
+    <p style="font-size:.88rem;color:var(--amber);letter-spacing:.12em;margin-bottom:.5rem">Primeira vez aqui?</p>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--text);margin-bottom:.8rem">Deixa a gente te apresentar.</h3>
+    <p style="font-size:.92rem;color:var(--text2);margin-bottom:1.2rem">Uma introdução de 4 passos. Não leva mais de 3 minutos.</p>
+    <button onclick="startOnboard()" style="background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.6rem 1.8rem;font-family:'EB Garamond',serif;cursor:pointer;border-radius:2px;transition:all .3s;font-size:.95rem" onmouseover="this.style.background='rgba(201,150,58,.1)'" onmouseout="this.style.background='transparent'">Começar a Jornada</button>
+  </div>
+
+  <!-- SIMPLE MODE ACCORDIONS (hidden in deep mode) -->
+  <div id="simple-block" style="display:none">
+    <div class="simple-mode-header">🌱 Modo Simples — versões acessíveis dos textos</div>
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)"><span>O Manifesto — versão simples</span><span class="acc-arrow">▾</span></div>
+      <div class="acc-body">
+        <p>Durante 200 mil anos, vivemos em grupos pequenos. Compartilhávamos a comida, cuidávamos das crianças juntos. Isso era <strong>natural</strong> — não uma utopia política.</p>
+        <p style="margin-top:.8rem">O sistema atual foi construído para que poucos acumulem e muitos se conformem. A ferramenta é simples: fazer as pessoas brigarem entre si enquanto a estrutura de dominação permanece intacta.</p>
+        <p style="margin-top:.8rem">A saída não é a revolução violenta. É o <strong>círculo</strong>: pessoas que se reúnem sem hierarquia, compartilham o pão, ouvem de verdade, e saem diferentes de como entraram.</p>
+        <p style="margin-top:.8rem">Dois mandamentos: ame a si mesmo como extensão do outro. Ame a ordem que protege esse amor. Tudo mais deriva disso.</p>
+      </div>
+    </div>
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)"><span>Teocnologia — versão simples</span><span class="acc-arrow">▾</span></div>
+      <div class="acc-body">
+        <p>A inteligência artificial é uma ferramenta poderosa. O resultado depende de quem a usa e com qual intenção.</p>
+        <p style="margin-top:.8rem">Se você chega com uma visão real — algo que carregou tempo suficiente para tomar forma — algo real emerge. Se chega querendo parecer profundo, o que sai parece profundo mas não ressoa.</p>
+        <p style="margin-top:.8rem"><strong>Você é o arquiteto. A IA é o artesão.</strong> A ferramenta constrói com maestria. Mas precisa que alguém chegue com o projeto.</p>
+      </div>
+    </div>
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)"><span>Neurocosmosofia — versão simples</span><span class="acc-arrow">▾</span></div>
+      <div class="acc-body">
+        <p>A astrologia identificou padrões de personalidade há milênios. A neurociência mapeia os mecanismos por trás desses padrões. A Neurocosmosofia propõe que podem ser a mesma coisa em línguas diferentes.</p>
+        <p style="margin-top:.8rem">As práticas do movimento funcionam por razões biológicas concretas: o silêncio ativa o nervo vago. A caminhada em natureza produz BDNF (cria novas conexões no cérebro). O círculo reduz cortisol.</p>
+        <p style="margin-top:.8rem">Não é magia. É neurologia que culturas antigas descobriram antes da ciência ter nome para isso.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards-section" id="portal-cards">
+    <div class="cards-section-head">
+      <span class="cards-daily-label">Arquétipos Cósmicos · Cartas Diárias</span>
+      <h2>Qual arquétipo chama você hoje?</h2>
+    </div>
+    <p class="cards-daily-text" id="cards-daily-text">Cada dia traz três arquétipos diferentes. Escolha uma carta, receba uma leitura. Volte amanhã — o baralho renova.</p>
+    <p class="cards-warning">⚠ As cartas são reflexos, não prescrições. Use como espelho — não como oráculo absoluto.</p>
+    <div class="cards-grid" id="cards-grid">
+      <!-- cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- MEDITATION -->
+  <div class="med-section" id="portal-med">
+    <p class="layer-label">Silêncio como Prática</p>
+    <h2 class="med-title">Meditação</h2>
+    <p class="med-sub">Cinco minutos de silêncio podem mudar uma semana.</p>
+    <div class="med-timer" id="med-display">5:00</div>
+    <div class="med-done" id="med-done"></div>
+    <div class="med-durations">
+      <button class="med-dur-btn active" data-mins="5" onclick="setMedDur(5,this)">5 min</button>
+      <button class="med-dur-btn" data-mins="10" onclick="setMedDur(10,this)">10 min</button>
+      <button class="med-dur-btn" data-mins="20" onclick="setMedDur(20,this)">20 min</button>
+    </div>
+    <button class="med-start-btn" id="med-btn" onclick="toggleMed()">Iniciar</button>
+  </div>
+
+  <!-- QUIZ ARQUETIPO -->
+  <div class="quiz-section" id="portal-quiz-arq">
+    <p class="layer-label">Neurocosmosofia · Quiz</p>
+    <h2>Qual é o seu arquétipo cósmico?</h2>
+    <p style="font-size:.88rem;color:var(--text2);margin-bottom:.4rem">6 perguntas. Um reflexo — não uma verdade permanente.</p>
+    <p class="quiz-warning">⚠ Arquétipos descrevem padrões, não destinos. Questione o resultado.</p>
+    <div id="quiz-arq-container"></div>
+  </div>
+
+  <!-- QUIZ FILOSOFIA -->
+  <div class="quiz-section" id="portal-quiz-fil">
+    <p class="layer-label">Filosofia · Quiz</p>
+    <h2>Uma pergunta que pode mudar como você vê o mundo.</h2>
+    <p style="font-size:.88rem;color:var(--text2);margin-bottom:1.5rem">Não existem respostas certas — apenas pontos de partida.</p>
+    <div id="quiz-fil-container"></div>
+  </div>
+
+  <!-- ESPELHO -->
+  <div class="mirror-section" id="portal-esp">
+    <p class="layer-label">O Espelho Socrático</p>
+    <h2>Este não é um teste de personalidade.</h2>
+    <p class="mirror-sub">Testes entregam rótulos. O Espelho entrega uma pergunta que não vai embora. Cinco respostas. Uma pergunta que fica.</p>
+    <div id="espelho-container"></div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="testimonials">
+    <h2>Não é preciso estar pronto para entrar.</h2>
+    <div class="testi-grid">
+      <div class="testi-card"><p class="testi-text">"Eu cheguei pelo quiz dos arquétipos. Vi que era 'lunar' e fui ler o que isso significava. Fiquei duas horas lendo. Acabei no manifesto às 3 da manhã."</p><p class="testi-author">M., 28 anos</p></div>
+      <div class="testi-card"><p class="testi-text">"Minha amiga me mandou uma pergunta sem contexto. Não consegui responder. Fui procurar de onde era. Dois meses depois estava num acampamento."</p><p class="testi-author">L., 34 anos</p></div>
+      <div class="testi-card"><p class="testi-text">"Eu achei que era um site de astrologia. Não é. É algo que ainda não tem nome certo — e isso, de alguma forma, é o ponto."</p><p class="testi-author">T., 22 anos</p></div>
+      <div class="testi-card"><p class="testi-text">"Entrei pelo modo simples porque o profundo me assustou. Uma semana depois voltei e fui pelo profundo. Ainda estou aqui."</p><p class="testi-author">R., 41 anos</p></div>
+    </div>
+  </div>
+
+  <!-- DISQUS COMMENTS -->
+  <div class="disqus-section">
+    <p class="layer-label">Comunidade · Relatos</p>
+    <h2>O que o movimento despertou em você?</h2>
+    <p class="disqus-sub">Compartilhe sua experiência. Sem julgamento, sem hierarquia — assim como nos círculos.</p>
+    <div id="disqus_thread"></div>
+    <noscript>Por favor, ative o JavaScript para ver os <a href="https://disqus.com/?ref_noscript">comentários via Disqus.</a></noscript>
+  </div>
+
+</section>
+
+<!-- ===== LAYER 2: ESCRITURAS ===== -->
+<section id="layer2" class="layer" style="display:none">
+  <p class="layer-label">Camada 2 · As Escrituras</p>
+  <h2 class="layer-title">Para quem já está imerso.</h2>
+  <p class="layer-sub">Quatro documentos. Uma alma. Cada um revela mais quando você está pronto.</p>
+
+  <div id="simple-block2" style="display:none">
+    <div class="simple-mode-header">🌱 Modo Simples — versões acessíveis dos textos acima</div>
+  </div>
+
+  <div class="escrituras-grid">
+    <div class="escritura-card" onclick="openModal('modal-manifesto')">
+      <p class="esc-num">I · A Alma</p>
+      <h3 class="esc-title">Manifesto Social-Autonomista</h3>
+      <p class="esc-sub">Edição Revisada e Completa</p>
+      <p class="esc-desc">O texto fundacional. Filosofia, poesia e crítica social que desperta a consciência coletiva.</p>
+      <span class="esc-link">Ler agora →</span>
+    </div>
+    <div class="escritura-card" onclick="openModal('modal-espirito')">
+      <p class="esc-num">II · O Espírito</p>
+      <h3 class="esc-title">O Espírito do Movimento</h3>
+      <p class="esc-sub">Para quem carrega o ideal</p>
+      <p class="esc-desc">Os dois mandamentos e os princípios vivos. O mediador não é cargo — é disposição de ser.</p>
+      <span class="esc-link">Ler agora →</span>
+    </div>
+    <div class="escritura-card" onclick="openModal('modal-perguntador')">
+      <p class="esc-num">III · O Corpo</p>
+      <h3 class="esc-title">O Perguntador</h3>
+      <p class="esc-sub">Manual dos Círculos Socráticos</p>
+      <p class="esc-desc">A metodologia completa para conduzir círculos. Da anatomia de um encontro à fissão celular.</p>
+      <span class="esc-link">Ler agora →</span>
+    </div>
+    <div class="escritura-card" onclick="openModal('modal-analise')">
+      <p class="esc-num">IV · O Fundo</p>
+      <h3 class="esc-title">Análise Aprofundada</h3>
+      <p class="esc-sub">Teocnologia · Neurocosmosofia</p>
+      <p class="esc-desc">A dimensão teórica completa do movimento — o que pode ficar subentendido.</p>
+      <span class="esc-link">Ler agora →</span>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-top:3rem">
+    <p>Chamamos de Escrituras porque não são manuais. Manual você segue. Escritura você reconhece.</p>
+  </div>
+</section>
+
+<!-- ===== LAYER 3: PRÁTICA ===== -->
+<section id="layer3" class="layer" style="display:none">
+  <p class="layer-label">Camada 3 · A Prática</p>
+  <h2 class="layer-title">O movimento vivido.</h2>
+  <p class="layer-sub">A consciência sem ação é especulação. Aqui o movimento se torna carne e fogo.</p>
+
+  <div class="pratica-grid">
+    <div class="pratica-card"><p class="prat-icon">◯</p><h3 class="prat-title">Círculos Socráticos</h3><p class="prat-desc">Grupos sem hierarquia onde a síntese emerge do encontro. O mediador guarda o espaço — não domina o conteúdo.</p></div>
+    <div class="pratica-card"><p class="prat-icon">🌿</p><h3 class="prat-title">Caminhadas na Mata</h3><p class="prat-desc">Silêncios em movimento. Roupas brancas. A natureza como co-meditante. O BDNF floresce entre raízes.</p></div>
+    <div class="pratica-card"><p class="prat-icon">🔥</p><h3 class="prat-title">Acampamentos</h3><p class="prat-desc">Presença total. Todos dormem no mesmo chão. O desconforto compartilhado dissolve o ego com mais eficiência que qualquer técnica.</p></div>
+    <div class="pratica-card"><p class="prat-icon">♡</p><h3 class="prat-title">Caridade</h3><p class="prat-desc">O pão antes do debate. Quem chega com fome é recebido primeiro. Franciscano sem ser franciscano.</p></div>
+    <div class="pratica-card"><p class="prat-icon">—</p><h3 class="prat-title">Meditação</h3><p class="prat-desc">Antes dos círculos, antes das caminhadas — o silêncio. Não como preparação. Como o que vem antes, durante e depois de tudo.</p></div>
+    <div class="pratica-card"><p class="prat-icon">↺</p><h3 class="prat-title">Fissão Celular</h3><p class="prat-desc">Cada círculo maduro gera outro. Sem hierarquia — com memória viva do processo. O movimento cresce como as células.</p></div>
+  </div>
+
+  <div class="quote-block">
+    <p>Vibrará sem estar, pois as ideias irão ressoar.</p>
+    <cite>— Das Escrituras</cite>
+  </div>
+
+  <div style="margin-top:3rem;padding:2rem;background:var(--bg2);border:1px solid var(--line);border-radius:6px;text-align:center">
+    <p style="color:var(--text2);line-height:1.9;font-size:.95rem">Este texto não tem dono.<br>Se algo aqui ecoou em você, é porque sempre esteve em você.</p>
+    <button onclick="openModal('modal-manifesto')" style="margin-top:1.2rem;background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.65rem 1.8rem;font-family:'EB Garamond',serif;cursor:pointer;border-radius:2px;transition:all .3s;font-size:.95rem" onmouseover="this.style.background='rgba(201,150,58,.1)'" onmouseout="this.style.background='transparent'">Começar pelo Manifesto</button>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer id="main-footer" style="display:none">
+  <div class="footer-links">
+    <a href="#layer1">Portal</a>
+    <a href="#portal-cards">Cartas</a>
+    <a href="#portal-med">Meditação</a>
+    <a href="#portal-quiz-arq">Quiz</a>
+    <a href="#portal-esp">O Espelho</a>
+    <a href="#layer2">Escrituras</a>
+    <a href="#layer3">Prática</a>
+    <a href="https://movimento-social-autonomista.vercel.app/" target="_blank">↗ Site Completo</a>
+  </div>
+  <p>Social-Autonomista</p>
+  <p>Sem data · Sem assinatura · Sem dono · Pertence a quem reconhecer</p>
+</footer>
+
+<!-- ===== ORACLE ===== -->
+<button id="oracle-toggle" style="display:none" title="Oráculo do Movimento">✦</button>
+<div id="oracle-panel">
+  <div class="oracle-head">
+    <span class="oracle-head-title">✦ Oráculo do Movimento</span>
+    <div style="display:flex;gap:.6rem;align-items:center">
+      <button id="oracle-clear-btn" title="Limpar conversa" style="background:none;border:1px solid var(--line);color:var(--text3);font-size:.75rem;padding:.3rem .6rem;border-radius:2px;cursor:pointer;font-family:'EB Garamond',serif;transition:all .2s" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber2)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--text3)'">Limpar</button>
+      <button class="oracle-head-close">✕</button>
+    </div>
+  </div>
+  <div class="oracle-messages" id="oracle-msgs"></div>
+  <div class="oracle-input-row">
+    <input type="text" id="oracle-input" class="oracle-input" placeholder="Pergunte ao oráculo...">
+    <button class="oracle-send-btn">→</button>
+  </div>
+  <div class="oracle-key-notice">Gemini AI · Powered by Social-Autonomista</div>
+</div>
+
+<script>
+// ===== DATA =====
+const ARCHETYPES = [
+  {id:0,glyph:'🌙',name:'O Lunar',keywords:'sensível · intuitivo · receptor',desc:'Você habita as margens. Percebe o que os outros não nomeiam. Sua força não é na ação — é na recepção profunda. O Lunar sente o campo emocional de um círculo antes de qualquer palavra ser dita.',qualities:'Empatia, introspecção, intuição emocional, escuta',shadow:'Absorção excessiva, dificuldade de limites, melancolia'},
+  {id:1,glyph:'☀️',name:'O Solar',keywords:'criativo · expressivo · generoso',desc:'Você ilumina ambientes. Sua presença é percebida — não por imposição, mas por calor genuíno. O Solar nutre os outros com criatividade e entusiasmo que não perdem forma.',qualities:'Vitalidade, expressão, generosidade, liderança natural',shadow:'Necessidade de atenção, dificuldade no silêncio'},
+  {id:2,glyph:'🌿',name:'O Guardião',keywords:'protetor · enraizado · paciente',desc:'Você sustenta o que os outros constroem. Sua força é a constância — o cuidado que não exige reconhecimento. O Guardião é a memória viva de um círculo, o que garante que o que foi fundado, permanece.',qualities:'Resiliência, cuidado, presença constante, memória',shadow:'Resistência à mudança, peso do que carrega'},
+  {id:3,glyph:'🔥',name:'O Alquimista',keywords:'transformador · visionário · feroz',desc:'Você não aceita as coisas como são. Sua presença catalisa mudança — às vezes sem querer. O Alquimista dissolve o que está fossilizado e revela o que havia embaixo.',qualities:'Visão, coragem, criatividade radical, intensidade',shadow:'Impaciência, dificuldade de terminar o que começa'},
+  {id:4,glyph:'⭐',name:'O Navegador',keywords:'explorador · adaptável · curioso',desc:'Você se move entre mundos com facilidade que outros invejam. O Navegador conecta o que parecia separado — pessoas, ideias, culturas. Sua casa é a travessia.',qualities:'Adaptabilidade, conexão, curiosidade, síntese',shadow:'Dificuldade de aprofundar, inquietude crônica'},
+  {id:5,glyph:'🌊',name:'O Profeta',keywords:'clarividente · empático · profundo',desc:'Você vê aonde os outros ainda não chegaram. Não por profecias — por atenção ao que está se formando. O Profeta fala o que o grupo sente mas não tem coragem de nomear.',qualities:'Clareza, profundidade, coragem de nomear, escuta',shadow:'Solidão, sensação de não ser compreendido'},
+  {id:6,glyph:'◯',name:'O Mediador',keywords:'harmonizador · neutro · sábio',desc:'Você guarda o espaço para que os outros pensem melhor. O Mediador não tem respostas — tem presença. Sua neutralidade não é indiferença: é a habilidade rara de estar completamente sem agenda.',qualities:'Neutralidade ativa, presença, escuta sem julgamento',shadow:'Dificuldade de tomar partido quando necessário'},
+  {id:7,glyph:'✦',name:'O Herético',keywords:'questionador · livre · iconoclasta',desc:'Você não aceita o consenso como verdade. Sua função no círculo é a pergunta que desconforta — a que revela que o que chamamos de acordo era apenas silêncio com medo.',qualities:'Pensamento crítico, originalidade, honestidade radical',shadow:'Isolamento, dificuldade de colaborar'},
+  {id:8,glyph:'🌱',name:'O Semeador',keywords:'paciente · generoso · longevo',desc:'Você planta sem garantia de colheita. O Semeador compreende que a maior parte do trabalho real é invisível — e que o fruto pertence ao tempo, não a quem plantou.',qualities:'Paciência, generosidade silenciosa, visão de longo prazo',shadow:'Frustração com resultados lentos'},
+  {id:9,glyph:'🦅',name:'O Vidente',keywords:'perspicaz · distante · cirúrgico',desc:'Você vê do alto o que os outros veem de perto. O Vidente identifica padrões, sistemas, estruturas — antes de qualquer outro perceber que existem.',qualities:'Análise, padrão-reconhecimento, perspectiva ampla',shadow:'Dificuldade de conexão emocional, frieza percebida'},
+  {id:10,glyph:'⚡',name:'O Trovador',keywords:'comunicador · artístico · conectador',desc:'Você transforma o que é complexo em algo que toca. O Trovador usa linguagem, arte e história como pontes. Sem ele, as ideias mais profundas ficam presas em vocabulário inacessível.',qualities:'Comunicação, arte, tradução do complexo',shadow:'Superficialidade em excesso, sedução sem profundidade'},
+  {id:11,glyph:'🫀',name:'O Guardador',keywords:'memorialista · leal · raiz',desc:'Você é a memória viva de tudo que importou. O Guardador não esquece — não por obsessão, mas porque compreende que sem memória não há identidade coletiva.',qualities:'Fidelidade, memória, cuidado com o legado',shadow:'Dificuldade de soltar o passado'}
+];
+
+const DAILY_PHRASES = [
+  "A tribo não era uma escolha política. Era o corpo funcionando como sempre soube funcionar.",
+  "O movimento que começa dentro é o único que ninguém pode confiscar.",
+  "Sentimos falta de algo que não conseguimos nomear. Dizemos solidão. Mas é mais simples e mais antigo.",
+  "O círculo não tem cabeceira. Sem ponta de mesa, não há onde sentar o poder.",
+  "Retire tudo que te define. O que sobra não é ausência. É potência pura.",
+  "Quem não controla sua atenção não controla muito além disso.",
+  "A compaixão é o verdadeiro exemplo de força.",
+  "Nenhuma frequência é descartável antes de ser ouvida.",
+  "Vibrará sem estar, pois as ideias irão ressoar.",
+  "O pão antes do debate. Quem chega com fome é recebido primeiro.",
+  "O silêncio antes da palavra não é preparação — é o que vem antes de tudo.",
+  "A presença real é rara. Não porque seja difícil de entender — porque exige abandono temporário de si.",
+  "Não é possível estar em dois lugares ao mesmo tempo. E a maioria das pessoas passa a vida tentando.",
+  "O que foi perdido não precisa ser resgatado por nostalgia. Precisa ser reconhecido como sabedoria.",
+  "Meditar não é esvaziar a mente. É aprender a não ser governado por ela.",
+  "A atenção é o recurso mais escasso e mais disputado do século XXI.",
+  "Quando você remove o condicionamento e o medo, o que resta não quer dominar. Quer conectar.",
+  "O debate não busca vencedores. Busca o que nenhuma frequência poderia produzir sozinha.",
+  "Você não precisa de mais tempo. Precisa de menos distância do que já está acontecendo.",
+  "A pergunta que ninguém responde de imediato é a certa.",
+  "Ninguém é mais irremediavelmente escravo do que aquele que falsamente acredita ser livre.",
+  "O maior presente que podemos entregar a alguém não é atenção administrada — é nossa dissolução temporária.",
+  "A resistência que fica. A oliveira que sobrevive a séculos de podas forçadas — e ainda floresce.",
+  "Eu sou porque somos. A pessoa se torna pessoa através das outras pessoas.",
+  "A liberdade que o movimento pratica não é a que grita na praça pública.",
+  "O círculo produz o que nenhum indivíduo produziria sozinho.",
+  "A memória somática de um estado que existiu por duzentos milênios.",
+  "A única regra: o pão antes do debate.",
+  "Cada encontro é um ato de Sumud — resistência que não grita, que permanece.",
+  "Este texto não tem dono. Pertence a quem reconhecer."
+];
+
+const CARDS_DAILY_TEXTS = [
+  "Cada dia traz três arquétipos diferentes. Escolha uma carta. O baralho renova ao amanhecer.",
+  "O arquétipo não é um destino — é um espelho. O que você reconhece nele já estava em você.",
+  "Três cartas para hoje. Qual delas chama mais do que as outras? Isso já é uma leitura.",
+  "Hoje o baralho trouxe estas três frequências. Nenhuma é melhor — cada uma revela algo diferente.",
+  "As cartas de hoje foram escolhidas pelo movimento do dia. Escolha com atenção — não com pressa.",
+  "Três arquétipos emergiram esta manhã. Deixe o corpo escolher antes de a mente analisar.",
+  "O baralho gira a cada dia. Se você voltou, é porque algo ficou sem resposta ontem.",
+  "Hoje, três padrões se apresentam. Qual deles ressoa — e qual deles resiste?",
+  "Cada carta é uma pergunta disfarçada de resposta. Escolha. Depois questione.",
+  "O arquétipo que você escolhe não é aleatório. Há algo que seu corpo já sabe.",
+  "Três frequências para hoje. Uma delas fala mais alto — mas talvez não seja a mais fácil.",
+  "O que as cartas mostram não é quem você é. É o que você está, hoje.",
+  "Hoje o baralho renovou. Três novos arquétipos para explorar com atenção.",
+  "Escolha uma carta não pelo que parece mais bonito — pelo que causa alguma coisa em você.",
+  "Três espelhos hoje. O que você vê em cada um diz mais sobre você do que sobre os arquétipos.",
+  "O baralho cósmico girou esta manhã. Três cartas aguardam sua atenção.",
+  "Um arquétipo diferente para cada dia. O que hoje trouxe que ontem não trouxe?",
+  "Estas são as cartas de hoje. Amanhã, outras três. O padrão é o movimento — não a fixação.",
+  "Não escolha com a cabeça. Escolha com o que se move primeiro em você.",
+  "O arquétipo de hoje não é uma sentença. É um ponto de partida.",
+  "Três cartas, três espelhos. Qual reflete o que você menos quer ver?",
+  "O baralho gira com o sol. Três arquétipos para esta virada do dia.",
+  "Hoje: três possibilidades. Amanhã: três outras. O movimento não para.",
+  "Escolha uma carta. Depois pergunte: por que esta e não as outras?",
+  "As cartas de hoje foram tecidas pelo calendário. Cada dia, um novo arranjo.",
+  "Três arquétipos emergem hoje. Qual deles você reconhece imediatamente?",
+  "O baralho é um espelho que se reorganiza a cada amanhecer.",
+  "Hoje, o cosmos oferece estas três frequências. A escolha é sua.",
+  "Cartas novas a cada dia. A leitura que importa não é a da carta — é a que surge em você.",
+  "O arquétipo que você escolhe hoje pode não ser o mesmo que escolheria amanhã. Isso é o ponto."
+];
+
+// ===== POOL DE PERGUNTAS — ARQUÉTIPO (30) =====
+const QUIZ_ARQ_POOL = [
+  {q:'Quando um grupo enfrenta um conflito difícil, você instintivamente...', opts:['Tenta reconciliar antes que escale','Diz o que todos pensam mas ninguém fala','Busca as raízes do problema','Cria espaço para cada voz'],scores:[6,7,9,10]},
+  {q:'Qual destas atividades te dá mais energia?', opts:['Cuidar de alguém em dificuldade','Criar algo do zero — arte, projeto, ideia','Explorar algo completamente novo','Ter uma conversa que vai fundo'],scores:[2,1,4,5]},
+  {q:'O que mais te incomoda em grupos?', opts:['Hierarquia disfarçada de colaboração','Quando ninguém questiona o óbvio','Energia que fica superficial demais','Quando as pessoas não ouvem de verdade'],scores:[6,7,0,6]},
+  {q:'Qual arquétipo clássico mais ressoa com você?', opts:['O guardião da memória e da tradição','O visionário que vê onde os outros não chegaram','O mensageiro que conecta mundos','O sábio que guarda silêncio'],scores:[11,3,4,9]},
+  {q:'Como você prefere contribuir num projeto coletivo?', opts:['Garantindo que nada se perde','Trazendo perspectiva nova','Tornando o complexo acessível','Sendo a presença que sustenta o grupo'],scores:[11,9,10,2]},
+  {q:'O que você mais valoriza num encontro verdadeiro?', opts:['Ser completamente ouvido','A pergunta que ninguém esperava','O silêncio que precede algo importante','A síntese que surgiu sem planejamento'],scores:[0,7,6,6]},
+  {q:'Diante de uma injustiça clara, sua reação natural é...', opts:['Nomear o que está acontecendo em voz alta','Buscar entender por que aconteceu','Agir para mudar a situação imediatamente','Criar espaço para que todos se expressem'],scores:[7,9,3,6]},
+  {q:'Qual imagem te representa mais?', opts:['A raiz que sustenta a árvore invisível','A chama que aquece sem consumir','O pássaro que vê tudo do alto','A água que toma a forma do recipiente'],scores:[2,1,9,6]},
+  {q:'Quando você está em sua melhor forma, você é...', opts:['O que todos procuram quando precisam de presença','O que ninguém esperava e todos precisavam ouvir','O que viu o problema antes de ele aparecer','O que conectou pessoas que não se conheciam'],scores:[0,7,5,4]},
+  {q:'O que você faz quando uma ideia não funciona?', opts:['Analiso o que pode ser preservado','Dissolvo tudo e começo do zero','Busco quem pode contribuir com uma perspectiva nova','Escuto o grupo antes de decidir'],scores:[11,3,4,6]},
+  {q:'Sua maior satisfação numa conversa é...', opts:['Quando o outro se sente verdadeiramente ouvido','Quando a conversa chegou onde nenhum dos dois esperava','Quando você disse o que precisava ser dito','Quando o silêncio disse mais que as palavras'],scores:[0,10,7,6]},
+  {q:'Em que papel você se encaixa naturalmente?', opts:['Guardador de histórias e memórias','Dissipador de névoas e ilusões','Construtor de pontes entre mundos','Sustentador silencioso de quem está ao redor'],scores:[11,7,4,2]},
+  {q:'O que te move mais profundamente?', opts:['A beleza do que resiste ao tempo','A urgência do que precisa mudar agora','A possibilidade do que ainda não existe','A riqueza do que está oculto nas pessoas'],scores:[11,3,1,0]},
+  {q:'Como você lida com o desconhecido?', opts:['Com curiosidade — é onde as coisas interessantes moram','Com cautela — o desconhecido precisa ser mapeado','Com abertura — sem resistência, como água','Com questionamento — o desconhecido precisa ser nomeado'],scores:[4,9,6,7]},
+  {q:'O que você traz de único para um círculo?', opts:['A pergunta que ninguém ousou fazer','A memória viva do que já foi construído','O olhar que conecta os pontos que outros não viam','A presença que faz o espaço seguro'],scores:[7,11,9,6]},
+  {q:'Quando algo está errado mas todos fingem que não está, você...', opts:['Nomeia em voz alta, mesmo que incommode','Busca entender por que a ilusão foi criada','Cria uma situação onde a verdade pode aparecer','Aguarda — às vezes a ilusão precisa de tempo'],scores:[7,9,6,2]},
+  {q:'Sua relação com o passado é...', opts:['De preservação — o que foi tem valor permanente','De aprendizado — o passado é professsor, não lar','De transformação — o passado é material a refundir','De leveza — vivo mais no presente que na memória'],scores:[11,9,3,4]},
+  {q:'O que o seu silêncio costuma comunicar?', opts:['Que estou processando algo importante','Que estou observando antes de agir','Que há algo que não tenho palavras para nomear','Que estou presente para o outro sem precisar falar'],scores:[9,5,0,6]},
+  {q:'Em que tipo de crise você se torna mais essencial?', opts:['Quando o grupo perdeu a memória do que importa','Quando a verdade precisa ser dita sem rodeios','Quando é necessário ver o sistema como um todo','Quando as pessoas precisam de presença mais que de solução'],scores:[11,7,9,2]},
+  {q:'Qual é o seu modo natural de criar?', opts:['A partir de uma visão que carrego há muito tempo','Improvisando a partir do que o momento traz','Conectando elementos que nunca estiveram juntos','Aprofundando o que já existe até revelar algo novo'],scores:[1,3,4,5]},
+  {q:'O que te diz que um encontro foi verdadeiro?', opts:['Uma mudança perceptível no outro','O silêncio no final — denso, não vazio','Algo que nenhum dos dois havia pensado antes','A sensação de que o tempo passou diferente'],scores:[10,6,10,0]},
+  {q:'Sua principal ferramenta é...', opts:['A pergunta certa no momento certo','A paciência de estar sem forçar','A capacidade de ver padrões invisíveis','A linguagem — transformar o complexo em algo que toca'],scores:[7,2,9,10]},
+  {q:'Qual é o seu medo mais legítimo em grupo?', opts:['Ser invisível quando tinha algo a dizer','Dominar sem perceber','Perder a conexão com o que é essencial','Não conseguir proteger quem está vulnerável'],scores:[5,1,11,2]},
+  {q:'O que você faz quando percebe que alguém está sofrendo?', opts:['Me aproximo e ofereço presença','Busco entender a causa antes de agir','Nomeio o que estou percebendo','Crio condições para que a pessoa possa falar'],scores:[2,9,7,6]},
+  {q:'O que você mais valoriza num líder?', opts:['Que guarde o espaço sem dominar o conteúdo','Que veja o que os outros ainda não viram','Que diga a verdade mesmo quando incomoda','Que lembre o grupo do que realmente importa'],scores:[6,5,7,11]},
+  {q:'Sua relação com a mudança é...', opts:['Sou o catalisador — acelerador','Sou o alicerce — o que permanece enquanto muda','Sou o mapeador — entendo antes de mover','Sou o conector — junto quem precisa se encontrar'],scores:[3,2,9,4]},
+  {q:'O que você faz quando o grupo perde o fio?', opts:['Lanço uma pergunta que reorienta','Trago a memória do que foi dito antes','Nomeio o que parece estar acontecendo','Guardo o silêncio até que o fio apareça'],scores:[7,11,5,6]},
+  {q:'Qual destas frases mais ressoa?', opts:['"Eu carrego o que os outros esquecem"','"Eu vejo o que os outros ainda não viram"','"Eu conecto o que parecia separado"','"Eu pergunto o que ninguém ousou"'],scores:[11,5,4,7]},
+  {q:'O que você precisa para funcionar bem num grupo?', opts:['Silêncio respeitado — espaço para processar','Clareza de propósito — saber por que estamos aqui','Diversidade real — vozes que discordam','Segurança emocional — poder ser honesto sem custo'],scores:[9,6,7,0]},
+  {q:'Qual é o legado que você naturalmente tende a deixar?', opts:['Algo que ainda estará lá quando você for','Uma pergunta que ninguém esquece','Um caminho que outros percorrem depois','A sensação de que aquele espaço foi seguro'],scores:[11,7,4,6]}
+];
+
+// ===== POOL DE PERGUNTAS — FILOSOFIA (30) =====
+const QUIZ_FIL_POOL = [
+  {q:'O que você chama de liberdade tem mais a ver com...', opts:['Ausência de obstáculos externos','Capacidade de se governar por dentro','Possibilidade de criar seu próprio caminho','Conexão genuína com os outros'],resp:['Liberdade negativa — protegida por leis e direitos. Necessária, mas incompleta.','Eleutheria estóica — a que Epicteto praticava mesmo sendo escravo. A única que ninguém pode tirar.','Autonomia criativa — liberdade como expressão do ser.','Liberdade relacional — o paradoxo de que só somos livres inteiramente no encontro com o outro.']},
+  {q:'O maior problema do mundo moderno é...', opts:['A desigualdade econômica e material','O isolamento e a fragmentação das comunidades','A perda de sentido e propósito coletivo','A concentração de poder em poucos'],resp:['Uma resposta estrutural, sistêmica. Correta — mas incompleta sem as outras.','A resposta do movimento. A epidemia invisível que nenhum PIB mede.','A crise de significado que Viktor Frankl viu nos campos de concentração.','A resposta política clássica. Verdadeira — mas a estrutura não muda sem que as pessoas mudem primeiro.']},
+  {q:'O que vem primeiro: mudar a si mesmo ou mudar o sistema?', opts:['Mudar a si mesmo — o externo reflete o interno','Mudar o sistema — estruturas moldam pessoas','As duas coisas em paralelo','Nenhuma das duas: o problema é a pergunta'],resp:['A tradição contemplativa. Mas sem ação estrutural, pode virar escapismo.','A tradição política crítica. Mas estruturas são feitas por pessoas.','A resposta mais honesta e mais difícil de sustentar.','A resposta filosófica mais radical. A dicotomia pode ser ela mesma uma armadilha.']},
+  {q:'O que torna uma conversa realmente valiosa?', opts:['Quando você aprende algo novo','Quando muda de ideia sobre algo que acreditava','Quando sente que foi completamente ouvido','Quando chega onde nenhum dos dois esperava'],resp:['Aprendizado como acúmulo — válido, mas pode acontecer lendo um livro.','Mudança de perspectiva — o sinal mais claro de que a conversa foi real.','Ser ouvido — o que a maioria mais precisa e menos recebe.','Síntese emergente — o que o círculo socrático busca.']},
+  {q:'Qual é o papel do silêncio numa conversa profunda?', opts:['Um espaço vazio que precisa ser preenchido','Um sinal de que algo real está sendo processado','Uma ferramenta que o mediador usa estrategicamente','A parte mais importante da conversa'],resp:['O desconforto moderno com o silêncio. Cada segundo vazio parece desperdício.','Silêncio como digestão — o que acontece antes da resposta aparecer de verdade.','Silêncio como técnica — válido, mas perde a alma quando vira instrumento.','A resposta contemplativa. O que Sócrates sabia antes de qualquer teoria.']},
+  {q:'O que é o ego, afinal?', opts:['Uma ilusão que precisamos desfazer','A estrutura que nos permite existir','Um instrumento — útil quando servil, destrutivo quando governa','A narrativa que contamos sobre nós mesmos'],resp:['A visão budista clássica — mas desconstruir o ego sem substituto pode ser perigoso.','A visão estruturalista — o ego como condição da consciência individual.','A resposta do movimento — o ego não é inimigo, é servo que confundiu sua função.','A visão narrativa de Paul Ricoeur — identidade como história contada, não essência fixa.']},
+  {q:'O que é comunidade para você?', opts:['Um lugar onde você pertence sem precisar se justificar','Um grupo com objetivo comum','Uma rede de segurança mútua','Um espaço onde você pode ser mais do que seria sozinho'],resp:['A definição tribal — pertencimento antes de função. O que o movimento busca recuperar.','A definição funcionalista — válida para projetos, insuficiente para tribo.','A definição de proteção — real, mas reativa. A tribo é mais que colchão de emergência.','A definição emergentista — o que a neurocosmosofia propõe: o círculo produz o que nenhum indivíduo produziria sozinho.']},
+  {q:'O que é autoridade legítima?', opts:['A que foi eleita democraticamente','A que emerge do reconhecimento natural do grupo','A que serve — não a que governa','A que sabe e demonstra'],resp:['A resposta democrática liberal — necessária, mas insuficiente para o círculo.','A resposta do movimento — o mediador não é eleito, é reconhecido.','A resposta franciscana — autoridade como serviço. "O maior entre vós será vosso servo."','A resposta tecnocrática — o problema é que "saber" pode ser mais uma forma de poder.']},
+  {q:'O que é uma vida boa?', opts:['Uma vida com sentido e propósito','Uma vida de conexões reais e profundas','Uma vida de liberdade — para criar, errar e aprender','Uma vida em equilíbrio com o que você realmente é'],resp:['A resposta aristotélica — eudaimonia como florescimento do ser em sua forma mais própria.','A resposta relacional — a boa vida como tecido de encontros reais.','A resposta liberal — autonomia como valor central.','A resposta do autoconhecimento — sophrosyne, o equilíbrio que vem de conhecer-se.']},
+  {q:'O que distingue uma crença de um preconceito?', opts:['A crença tem fundamento racional, o preconceito não','A crença foi testada, o preconceito nunca foi questionado','Não há distinção clara — toda crença é potencialmente preconceito','A diferença está na disposição de mudar diante de evidência'],resp:['A distinção epistemológica clássica — mas racional para quem? Em que contexto?','A distinção pragmatista — o que foi posto à prova pode ser atualizado.','A resposta cética radical — que leva à abertura, mas também ao niilismo epistêmico.','A distinção do movimento — aletheia: a verdade que aparece quando o que a encobria é removido.']},
+  {q:'O que é saúde mental, realmente?', opts:['Ausência de sofrimento significativo','Capacidade de funcionar na vida cotidiana','Equilíbrio dinâmico entre forças internas opostas','Conexão real consigo mesmo e com os outros'],resp:['A definição negativa — válida como piso, insuficiente como teto.','A definição funcionalista — perigosa: pode validar funcionamento anestesiado.','A definição dialética — a tensão que não se resolve, apenas se habita com mais ou menos consciência.','A definição do movimento — que é por isso que o círculo é saúde: não trata sintomas, restaura conexão.']},
+  {q:'Quando é legítimo desobedecer?', opts:['Quando a lei é claramente injusta','Quando a consciência individual entra em conflito com a regra','Sempre — toda obediência precisa de justificativa','Nunca — a ordem protege o amor, como o movimento propõe'],resp:['A resposta de Thoreau e de King — desobediência civil como imperativo moral.','A resposta kantiana — o imperativo categórico como limite à obediência.','A resposta anarquista — a autoridade precisa sempre ser justificada, nunca assumida.','A resposta do segundo mandamento — que não é cega: a ordem serve ao amor, não o substitui.']},
+  {q:'O que é solidariedade real?', opts:['Compartilhar recursos com quem tem menos','Estar presente quando ninguém mais está','Lutar pelos direitos de quem não pode lutar por si','Reconhecer que o sofrimento do outro é, de alguma forma, seu'],resp:['A solidariedade redistributiva — concreta e necessária, mas pode ser distante.','A solidariedade da presença — o que o movimento chama de dadirri.','A solidariedade política — transformar a compaixão em estrutura.','A solidariedade ontológica — Ubuntu: "eu sou porque somos." A mais radical.']},
+  {q:'O que é espiritualidade para você?', opts:['Uma relação com o sagrado ou transcendente','A prática de estar presente — completamente, aqui','A sensação de fazer parte de algo maior','O processo de se conhecer em profundidade'],resp:['A definição religiosa — que pode ou não incluir deus, mas inclui o sagrado.','A definição contemplativa — que o movimento incorpora sem nomear como espiritual.','A definição cósmica — que a neurocosmosofia mapeia neurologicamente.','A definição gnóstica — o saber direto que não precisa de mediação.']},
+  {q:'O que diferencia informação de sabedoria?', opts:['A sabedoria é testada pelo tempo','A sabedoria muda o comportamento, não só o pensamento','A sabedoria inclui o que não saber e reconhecer os limites','Não há diferença — sabedoria é informação bem integrada'],resp:['A definição temporal — que valida a tradição como portadora de sabedoria acumulada.','A definição pragmática — prajña: a percepção que transforma o modo de ver.','A definição socrática — "só sei que nada sei" como abertura epistemológica.','A resposta reducionista — válida para sistemas, insuficiente para a experiência vivida.']},
+  {q:'O que é vulnerabilidade num contexto de grupo?', opts:['Um risco — expor o que pode ser usado contra mim','Uma dádiva — o que torna a conexão possível','Um requisito para que algo real aconteça','Uma escolha de quem já tem segurança suficiente'],resp:['A leitura defensiva — racional em ambientes sem confiança.','A leitura de Brené Brown — a vulnerabilidade como coragem.','A leitura do círculo socrático — sem abertura, só há performance.','A leitura do segundo mandamento — a ordem cria segurança para que a vulnerabilidade seja dádiva, não suicídio.']},
+  {q:'O que é maturidade?', opts:['Aceitar que o mundo não vai mudar como você queria','Assumir responsabilidade sem perder a ternura','Saber distinguir o que depende de você do que não depende','Ter se decepcionado o suficiente para ficar sem ilusões'],resp:['A resposta resignada — que confunde maturidade com capitulação.','A resposta do movimento — a phronesis que não endurece, a sophrosyne que não fecha.','A resposta estoica — o locus de controle como fundamento da saúde mental.','A resposta cínica — que tem lucidez, mas paga o preço da amargura.']},
+  {q:'O que é perdão?', opts:['Liberar o outro da dívida que ele tem comigo','Liberar a mim mesmo do peso de carregar a mágoa','Um processo — não um ato único','Algo que se torna possível, não algo que se decide'],resp:['A definição relacional — que pressupõe reconhecimento da ofensa por quem ofendeu.','A definição terapêutica — ho\'oponopono: o processo que restaura antes de sentenciar.','A definição processual — a mais honesta para ofensas reais.','A definição graciosa — o que a tradição do ágape aponta: perdão que não espera condições ideais.']},
+  {q:'O que é tempo bem gasto?', opts:['Tempo em que fui produtivo','Tempo em que estive completamente presente','Tempo que me transformou de alguma forma','Tempo que importará quando eu olhar para trás'],resp:['A resposta do capitalismo industrial — que mede valor em output.','A resposta contemplativa — mono no aware: a qualidade do instante, não sua utilidade.','A resposta do crescimento — que valoriza a mudança como métrica.','A resposta do legado — que projeta valor no futuro, às vezes às custas do presente.']},
+  {q:'O que é um encontro verdadeiro?', opts:['Quando duas pessoas chegam a algo que nenhuma tinha antes','Quando alguém é visto como realmente é — não como parece','Quando o tempo passa diferente','Quando a conversa mudou algo sem que ninguém planejasse'],resp:['A definição de síntese — o que o círculo socrático busca.','A definição de Martin Buber — a relação Eu-Tu: o outro como sujeito, não objeto.','A definição fenomenológica — o sinal mais confiável do que o movimento chama de presença.','A definição emergente — o hāl: o estado que desce, não o que se produz.']},
+  {q:'O que é cuidado real?', opts:['Fazer pelo outro o que ele não consegue fazer','Estar presente sem precisar resolver','Criar condições para que o outro possa se ajudar','Dizer o que o outro precisa ouvir, mesmo que doa'],resp:['O cuidado de dependência — que sustenta crises, mas não deve ser o estado permanente.','O cuidado de presença — dadirri: sustentar o silêncio do outro até que ele esteja pronto.','O cuidado de empoderamento — Maimônides: o mais alto grau de tzedakah.','O cuidado de honestidade — satyagraha: firmeza na verdade como ato de amor.']},
+  {q:'O que é identidade?', opts:['O que permanece em mim através do tempo','O conjunto das relações que me constituem','A narrativa que construo sobre quem sou','Algo fluido — muda com cada fase e contexto'],resp:['A identidade essencialista — a alma imutável que persiste.','A identidade relacional — Ubuntu: você é na medida em que os outros te constituem.','A identidade narrativa de Ricoeur — o eu como personagem de uma história em curso.','A identidade processual — que o movimento honra: "retire tudo que te define. O que sobra é potência pura."']},
+  {q:'O que é compaixão — sem confundir com pena?', opts:['Sentir com o outro — não sentir pelo outro','Agir para reduzir o sofrimento do outro','Reconhecer no sofrimento do outro algo que também é meu','Estar presente sem tentar consertar'],resp:['A distinção budista — compaixão como "sentir-com", pena como "olhar de cima".','A compaixão ativa — Jampa: o amor que não exige retorno, mas se traduz em ação.','A compaixão ontológica — Ubuntu: a ferida no outro ressoa porque compartilhamos a mesma natureza.','A compaixão contemplativa — kenosis: esvaziar-se para que o outro caiba inteiro.']},
+  {q:'O que é poder?', opts:['Capacidade de influenciar decisões','Autoridade reconhecida pelo grupo','Energia que flui quando você está alinhado com o que é','Controle sobre recursos e informação'],resp:['A definição política — que não é negativa em si, mas precisa de controle.','A definição do movimento — poder como reconhecimento, não imposição.','A definição de Wu wei — agir sem forçar: eficiência que não parece esforço.','A definição crítica — que o movimento critica: o poder que se mantém pela escassez.']},
+  {q:'O que diferencia um grupo de uma comunidade?', opts:['A duração — comunidades duram mais','A profundidade — comunidades se conhecem de verdade','A intenção — comunidades existem para o bem mútuo','O pertencimento — em comunidade, você não precisa se justificar'],resp:['A distinção temporal — válida, mas grupos temporários podem ter mais comunidade que organizações antigas.','A distinção da profundidade — gnosis: conhecimento direto que só vem de tempo e presença real.','A distinção de propósito — que pode ser armadilha: comunidade ideológica pode ser perigosa.','A distinção do movimento — Uri: o eu que só existe no plural.']},
+  {q:'O que é justiça?', opts:['Cada um receber o que merece','Cada um receber o que precisa','A reparação do dano causado','O arranjo que todos aceitariam sem saber qual papel ocupariam'],resp:['A justiça proporcional — de Aristóteles: distributiva e comutativa.','A justiça de necessidade — Ma\'at: equilíbrio cósmico que vai além do mérito.','A justiça restaurativa — ho\'oponopono e tikkun olam: reparar antes de punir.','A justiça rawlsiana — o "véu da ignorância" como teste de imparcialidade.']},
+  {q:'O que é memória coletiva?', opts:['O conjunto de eventos que um grupo compartilha','O que uma comunidade escolhe lembrar — e esquecer','A identidade de um grupo projetada no tempo','O que sobrevive quando os indivíduos que viveram já não estão'],resp:['A definição de Maurice Halbwachs — memória como construção social, não arquivo individual.','A definição crítica — Sankofa: voltar para buscar o que ficou, reconhecendo o que foi apagado.','A definição identitária — que o movimento usa: "somos uma memória que busca se lembrar de si."','A definição de transmissão — a genealogia dos círculos: fissão celular como memória viva.']},
+  {q:'O que é humildade genuína?', opts:['Colocar-se abaixo dos outros','Saber com precisão o espaço que se ocupa — nem mais, nem menos','Estar sempre disposto a aprender','Não precisar que os outros saibam o que você fez'],resp:['A humildade como diminuição — que o movimento rejeita: não é apagamento, é precisão.','A humildade como Anava — Moisés: o mais humilde confrontou o Faraó. Humildade como enraizamento.','A humildade como abertura — śraddhā: o ouvido interior voltado para o que é mais sábio que o ego.','A humildade sem plateia — que é a mais difícil: aparigraha do reconhecimento.']},
+  {q:'O que é uma pergunta boa?', opts:['A que tem resposta clara e verificável','A que ninguém estava esperando','A que o grupo não consegue responder de imediato','A que revela o que estava sendo evitado'],resp:['A pergunta científica — poderosa para o empírico, insuficiente para o existencial.','A pergunta socrática — a que interrompe o piloto automático.','A pergunta-âncora do círculo — "a que ninguém responde de imediato é a certa."','A pergunta do espelho — aletheia: revelar o que estava oculto, não acrescentar informação.']},
+  {q:'O que é amor que não romantiza?', opts:['Ação consistente, independente de sentimento','Presença que não precisa de retorno para persistir','Escolha que se renova todos os dias','A disposição de ser alterado pelo outro'],resp:['O amor como prática — simcha: não sentimento que se aguarda, mas prática que se cultiva.','O amor como ágape — persiste quando todos os motivos racionais acabaram.','O amor como emunah — compromisso que se sustenta pela ação mesmo sem certeza.','O amor como kenosis — esvaziar-se para que o outro caiba inteiro. O mais exigente.']},
+  {q:'O que é autoconhecimento real?', opts:['Saber seus pontos fortes e fracos','Entender por que você reage como reage','Ver o que você evita ver sobre si mesmo','A capacidade de não confundir quem você é com quem você foi condicionado a ser'],resp:['O autoconhecimento de inventário — útil como ponto de partida.','O autoconhecimento processual — nepsis: sobriedade que observa sem ser arrastada.','O autoconhecimento do espelho — aletheia: o des-velamento do que estava oculto.','O autoconhecimento da eleutheria — o primeiro mandamento como prática: amar a si mesmo como extensão, não como ego.']}
+];
+
+// ===== SELETOR DIÁRIO DE PERGUNTAS =====
+function getDailyQuizIndices(pool, count, saltStr) {
+  const seed = getDailySeed() + saltStr.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const arr = Array.from({length:pool.length},(_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(seededRand(seed,i)*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr.slice(0,count).map(i=>pool[i]);
+}
+
+// aliases usados pelo initQuiz
+function getTodayQuizArq(){ return getDailyQuizIndices(QUIZ_ARQ_POOL,6,'arq'); }
+function getTodayQuizFil(){ return getDailyQuizIndices(QUIZ_FIL_POOL,5,'fil'); }
+
+const ESPELHO_QS = [
+  {q:'Quando você erra, o primeiro impulso é...', opts:['Explicar o que aconteceu para os outros','Esconder e seguir em frente','Entender por que aconteceu','Atacar a mim mesmo'],keys:['externo','evasivo','reflexivo','autocrítico']},
+  {q:'O que você mais adia?', opts:['Uma conversa difícil que precisa acontecer','Um projeto pessoal que importa de verdade','Cuidar de mim mesmo de forma consistente','Uma decisão que vai mudar algo importante'],keys:['conflito','criação','autocuidado','mudança']},
+  {q:'Quando tudo fica quieto, você...', opts:['Coloca algo para tocar imediatamente','Pega o celular quase automaticamente','Fica confortável — o silêncio não te incomoda','Fica desconfortável sem saber por quê'],keys:['fuga-som','fuga-tela','presença','desconforto-vazio']},
+  {q:'O que você mais lê, mas menos pratica?', opts:['Saúde, corpo, sono, alimentação','Relações, afeto, comunicação','Propósito, sentido, direção de vida','Autonomia, dinheiro, independência'],keys:['corpo','relação','sentido','autonomia']},
+  {q:'O que você mais defende nos outros, mas menos aceita em si?', opts:['O direito de errar sem se destruir','O direito de descansar sem culpa','O direito de ser diferente sem se justificar','O direito de mudar de ideia sem parecer fraco'],keys:['auto-compaixão','descanso','autenticidade','flexibilidade']}
+];
+
+const ESPELHO_RESULTS = {
+  'externo-conflito-fuga-som-relação-autenticidade':'Você carrega um padrão de performance social — sua maior angústia não é o erro, é como o erro é visto. A pergunta que não vai embora: *você sabe a diferença entre o que você quer e o que você quer que os outros vejam que você quer?*',
+  'reflexivo-criação-presença-sentido-auto-compaixão':'Você tem autoconsciência rara — e é exatamente isso que te paralisa às vezes. A pergunta: *por que o projeto que mais importa para você ainda não existe?*',
+  'autocrítico-autocuidado-desconforto-vazio-corpo-descanso':'Você aplica a outros uma compaixão que nunca direciona para si. A pergunta que fica: *o que aconteceria se você se tratasse com a mesma generosidade que dá às pessoas que ama?*',
+  default:'Você tem um padrão que ainda não se deixou nomear completamente. A pergunta: *o que você sabe de si mesmo que ainda não disse em voz alta para ninguém?*'
+};
+
+const ORACLE_SYSTEM = `Você é o Oráculo do Movimento Social-Autonomista — um guia interno do site e do movimento.
+
+O Social-Autonomismo é um movimento filosófico e prático que propõe o retorno à vida em comunidade (tribo) como resposta à fragmentação moderna. Seus pilares são:
+- Dois mandamentos: amar a si mesmo como extensão do outro; amar a ordem que protege esse amor
+- Práticas: círculos socráticos, meditação, caminhadas na mata, acampamentos, caridade
+- Conceitos-chave: arquétipos cósmicos, neurocosmosofia, teocnologia, fissão celular
+- Raízes culturais: Sumud (árabe), Yuhá (Lakota), Uri (coreano), Ubuntu (Zulu), Talanoa (Fiji), Ayni (quéchua), etc.
+
+Você conhece o site por dentro. Pode guiar o visitante por qualquer seção, responder sobre filosofia, arquétipos, práticas ou história do movimento.
+
+Responda em português. Seja conciso, profundo e um pouco poético — como o próprio movimento. Não use markdown pesado. Máximo 3 parágrafos por resposta.`;
+
+// ===== STATE =====
+let mode = 'simples';
+let medInterval = null;
+let medSeconds = 300;
+let medRunning = false;
+let medTotal = 300;
+let onboardStep = 0;
+let quizArqAnswers = [];
+let quizFilStep = 0;
+let espelhoAnswers = [];
+let espelhoStep = 0;
+let currentCardIdx = null;
+
+// ===== SEED / DAILY =====
+function getDailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth()+1)*100 + d.getDate();
+}
+function seededRand(seed, i) {
+  let s = (seed * 1664525 + 1013904223 + i * 22695477) & 0x7fffffff;
+  return s / 0x7fffffff;
+}
+function getDailyCardIndices() {
+  const seed = getDailySeed();
+  const arr = Array.from({length:12},(_,i)=>i);
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(seededRand(seed, i) * (i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr.slice(0,3);
+}
+function getDayIndex() {
+  const d = new Date();
+  const start = new Date(d.getFullYear(),0,0);
+  return Math.floor((d-start)/(1000*60*60*24));
+}
+function getDailyPhrase() {
+  return DAILY_PHRASES[getDayIndex() % DAILY_PHRASES.length];
+}
+function getDailyCardsText() {
+  return CARDS_DAILY_TEXTS[getDayIndex() % CARDS_DAILY_TEXTS.length];
+}
+
+// ===== WELCOME =====
+document.getElementById('daily-phrase').textContent = getDailyPhrase();
+document.getElementById('btn-enter').onclick = () => {
+  document.getElementById('welcome').classList.add('hidden');
+  document.getElementById('mode-select').classList.add('active');
+};
+document.getElementById('btn-simples').onclick = () => { mode='simples'; enterSite(); };
+document.getElementById('btn-profundo').onclick = () => {
+  window.open('https://movimento-social-autonomista.vercel.app/','_blank');
+};
+
+function enterSite() {
+  document.getElementById('mode-select').classList.remove('active');
+  showSite();
+}
+function showSite() {
+  document.getElementById('main-nav').style.display='';
+  document.getElementById('layer1').style.display='';
+  document.getElementById('layer2').style.display='';
+  document.getElementById('layer3').style.display='';
+  document.getElementById('main-footer').style.display='';
+  document.getElementById('oracle-toggle').style.display='';
+  if(mode==='simples'){
+    document.getElementById('simple-block').style.display='';
+    document.getElementById('simple-block2').style.display='';
+  }
+  initCards();
+  initQuizArq();
+  initQuizFil();
+  initEspelho();
+  initOracle();
+  loadDisqus();
+  document.getElementById('cards-daily-text').textContent = getDailyCardsText();
+}
+
+// ===== ONBOARD =====
+const onboardSteps = [
+  {title:'Bem-vindo.',body:'Este não é um manifesto político, uma religião, ou um grupo de autoajuda. É uma proposta simples: o ser humano passou <strong>200 mil anos</strong> vivendo em grupos pequenos, ao redor do fogo, cuidando uns dos outros.<br><br>O que sentimos como falta, hoje, tem nome — e tem prática.',btn:'Continuar →'},
+  {title:'Uma pergunta antes.',body:'Quando foi a última vez que alguém te ouviu de verdade — sem pressa, sem celular, sem já preparar a resposta enquanto você falava?<br><br>Esse espaço que faltou tem um nome aqui: <em>o círculo</em>.',btn:'Continuar →'},
+  {title:'O que você vai encontrar.',body:'🃏 <strong>Cartas dos Arquétipos</strong> — leitura diária gerada por IA.<br><br>◯ <strong>Meditação com timer</strong> — 5, 10 ou 20 minutos.<br><br>✦ <strong>Quiz do Arquétipo</strong> — descubra seu padrão cósmico.<br><br>🔍 <strong>O Espelho</strong> — uma pergunta que não vai embora.<br><br>📜 <strong>As Escrituras</strong> — os textos quando você estiver pronto.',btn:'Continuar →'},
+  {title:'Uma última coisa.',body:'Tudo aqui é uma <em>proposta</em> — não verdade absoluta. Questione. Descarte o que não ressoa. Adapte o que ressoa.<br><br>A única regra: <strong>o pão antes do debate</strong>. Quem chega com fome é recebido primeiro.',btn:'Explorar →'}
+];
+function startOnboard() {
+  onboardStep = 0;
+  renderOnboard();
+  document.getElementById('onboard').classList.add('active');
+}
+function renderOnboard() {
+  const s = onboardSteps[onboardStep];
+  document.getElementById('onboard-step-label').textContent = `Passo ${onboardStep+1} de 4`;
+  document.getElementById('onboard-title').textContent = s.title;
+  document.getElementById('onboard-body').innerHTML = s.body;
+  document.getElementById('onboard-next').textContent = s.btn;
+  const dots = document.getElementById('onboard-dots');
+  dots.innerHTML = onboardSteps.map((_,i)=>`<div class="onboard-dot${i===onboardStep?' active':''}"></div>`).join('');
+}
+document.getElementById('onboard-next').onclick = () => {
+  if (onboardStep < 3) { onboardStep++; renderOnboard(); }
+  else { document.getElementById('onboard').classList.remove('active'); }
+};
+
+// ===== CARDS =====
+function initCards() {
+  const indices = getDailyCardIndices();
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  indices.forEach(idx => {
+    const a = ARCHETYPES[idx];
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<div class="card-glyph">${a.glyph}</div><div class="card-name">${a.name}</div><div class="card-keyword">${a.keywords.split(' · ')[0]}</div>`;
+    div.onclick = () => openCard(idx);
+    grid.appendChild(div);
+  });
+}
+function openCard(idx) {
+  currentCardIdx = idx;
+  const a = ARCHETYPES[idx];
+  document.getElementById('card-exp-glyph').textContent = a.glyph;
+  document.getElementById('card-exp-title').textContent = a.name;
+  document.getElementById('card-exp-keywords').textContent = a.keywords;
+  document.getElementById('card-exp-reading').innerHTML = '<p class="loading">Gerando leitura...</p>';
+  document.getElementById('card-expanded').classList.add('active');
+  generateCardReading(a);
+}
+document.getElementById('card-exp-close').onclick = () => { document.getElementById('card-expanded').classList.remove('active'); };
+async function generateCardReading(archetype) {
+  const el = document.getElementById('card-exp-reading');
+  const today = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  const prompt = `Hoje é ${today}. Gere uma leitura breve (3-4 parágrafos) para o arquétipo "${archetype.name}" (${archetype.keywords}) no contexto do Movimento Social-Autonomista. Qualidades: ${archetype.qualities}. Sombra: ${archetype.shadow}. A leitura deve ser pessoal, contemplativa e convidar à reflexão interna. Escreva em português.`;
+  const text = await callGemini([{role:'user',parts:[{text:prompt}]}]);
+  el.innerHTML = `<p style="font-size:.95rem;color:var(--text2);line-height:1.8">${text.replace(/\n\n/g,'</p><p style="font-size:.95rem;color:var(--text2);line-height:1.8;margin-top:.8rem">').replace(/\n/g,'<br>')}</p>`;
+}
+document.getElementById('card-exp-ask-btn').onclick = async () => {
+  const input = document.getElementById('card-exp-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  const a = ARCHETYPES[currentCardIdx];
+  const el = document.getElementById('card-exp-reading');
+  el.innerHTML += `<hr style="border:none;border-top:1px solid var(--line2);margin:1rem 0"><p style="font-size:.85rem;color:var(--amber2)">Pergunta: ${q}</p><p class="loading" id="card-answer">...</p>`;
+  const prompt = `No contexto do arquétipo "${a.name}" (${a.keywords}) do Movimento Social-Autonomista, responda de forma contemplativa: "${q}". Máximo 2 parágrafos. Em português.`;
+  const text = await callGemini([{role:'user',parts:[{text:prompt}]}]);
+  document.getElementById('card-answer').outerHTML = `<p style="font-size:.9rem;color:var(--text2);line-height:1.7;margin-top:.4rem">${text}</p>`;
+};
+
+// ===== GEMINI via serverless /api/gemini =====
+async function callGemini(messages, systemInstruction=null) {
+  try {
+    // Limitar histórico: manter só as últimas 10 trocas (20 mensagens)
+    const MAX_HISTORY = 20;
+    const trimmed = messages.length > MAX_HISTORY
+      ? messages.slice(messages.length - MAX_HISTORY)
+      : messages;
+
+    const body = { contents: trimmed, generationConfig: { temperature: 0.8, maxOutputTokens: 512 } };
+    if (systemInstruction) body.systemInstruction = systemInstruction; // string — backend empacota
+
+    const resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+    if (data.error) return `Erro: ${data.error}`;
+    return data.text || 'Sem resposta.';
+  } catch(e) {
+    return 'Erro de conexão com o Oráculo.';
+  }
+}
+
+// ===== ORACLE =====
+const ORACLE_MAX_HISTORY = 20;
+let oracleHistory = [];
+
+const oraclePanel    = document.getElementById('oracle-panel');
+const oracleToggle   = document.getElementById('oracle-toggle');
+const oracleClose    = document.querySelector('.oracle-head-close');
+const oracleClearBtn = document.getElementById('oracle-clear-btn');
+const oracleInput    = document.getElementById('oracle-input');
+const oracleSendBtn  = document.querySelector('.oracle-send-btn');
+const oracleMessages = document.querySelector('.oracle-messages');
+
+oracleToggle.addEventListener('click', () => oraclePanel.classList.toggle('active'));
+oracleClose.addEventListener('click',  () => oraclePanel.classList.remove('active'));
+oracleInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendOracleMessage(); });
+oracleSendBtn.addEventListener('click', sendOracleMessage);
+oracleClearBtn.addEventListener('click', () => {
+  oracleHistory = [];
+  oracleMessages.innerHTML = '';
+  appendOracleMessage('Conversa limpa. Por onde começamos?', 'bot');
+});
+
+function appendOracleMessage(text, type) {
+  const msg = document.createElement('div');
+  msg.className = 'oracle-msg ' + type;
+  msg.textContent = text; // seguro contra XSS
+  oracleMessages.appendChild(msg);
+  oracleMessages.scrollTop = oracleMessages.scrollHeight;
+  return msg;
+}
+
+function initOracle() {
+  appendOracleMessage('Olá. Sou o Oráculo — conheço o movimento por dentro. Posso te guiar pelo site, responder sobre arquétipos, filosofia ou práticas. Por onde começamos?', 'bot');
+}
+
+async function sendOracleMessage() {
+  const message = oracleInput.value.trim();
+  if (!message) return;
+  oracleInput.value = '';
+
+  appendOracleMessage(message, 'user');
+  oracleHistory.push({ role: 'user', parts: [{ text: message }] });
+  if (oracleHistory.length > ORACLE_MAX_HISTORY) oracleHistory = oracleHistory.slice(-ORACLE_MAX_HISTORY);
+
+  const loading = appendOracleMessage('O Oráculo está refletindo...', 'bot loading');
+
+  try {
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: ORACLE_SYSTEM,
+        contents: oracleHistory
+      })
+    });
+
+    const data = await response.json();
+    loading.remove();
+
+    if (data.error) {
+      appendOracleMessage('Erro: ' + data.error, 'bot');
+      return;
+    }
+
+    const reply = data.text || 'Silêncio...';
+    oracleHistory.push({ role: 'model', parts: [{ text: reply }] });
+    if (oracleHistory.length > ORACLE_MAX_HISTORY) oracleHistory = oracleHistory.slice(-ORACLE_MAX_HISTORY);
+
+    appendOracleMessage(reply, 'bot');
+
+  } catch (err) {
+    loading.remove();
+    appendOracleMessage('Erro ao consultar o Oráculo.', 'bot');
+  }
+}
+
+// ===== ESC para fechar modais =====
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+  document.getElementById('card-expanded').classList.remove('active');
+  document.getElementById('onboard').classList.remove('active');
+  document.body.style.overflow = '';
+});
+
+// ===== MEDITATION =====
+function setMedDur(mins, btn) {
+  if (medRunning) return;
+  medTotal = mins * 60;
+  medSeconds = medTotal;
+  document.querySelectorAll('.med-dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  updateMedDisplay();
+  document.getElementById('med-done').textContent = '';
+}
+function updateMedDisplay() {
+  const m = Math.floor(medSeconds/60).toString().padStart(2,'0');
+  const s = (medSeconds%60).toString().padStart(2,'0');
+  document.getElementById('med-display').textContent = `${m}:${s}`;
+}
+function toggleMed() {
+  const btn = document.getElementById('med-btn');
+  if (medRunning) {
+    clearInterval(medInterval);
+    medRunning = false;
+    btn.textContent = 'Iniciar';
+  } else {
+    medRunning = true;
+    btn.textContent = 'Pausar';
+    document.getElementById('med-done').textContent = '';
+    medInterval = setInterval(()=>{
+      medSeconds--;
+      updateMedDisplay();
+      if (medSeconds <= 0) {
+        clearInterval(medInterval);
+        medRunning = false;
+        btn.textContent = 'Iniciar';
+        document.getElementById('med-done').textContent = 'PRONTO';
+        medSeconds = medTotal;
+        updateMedDisplay();
+        try { const a = new AudioContext(); const o = a.createOscillator(); const g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value=432; g.gain.setValueAtTime(.3,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+3); o.start(); o.stop(a.currentTime+3); } catch(e){}
+      }
+    },1000);
+  }
+}
+updateMedDisplay();
+
+// ===== QUIZ ARQ =====
+let quizArqStep = 0;
+let quizArqTmpAns = -1;
+let quizArqToday = [];
+function initQuizArq() {
+  quizArqAnswers = [];
+  quizArqStep = 0;
+  quizArqTmpAns = -1;
+  quizArqToday = getTodayQuizArq();
+  renderQuizArq(0);
+}
+function renderQuizArq(step) {
+  quizArqStep = step;
+  quizArqTmpAns = -1;
+  const c = document.getElementById('quiz-arq-container');
+  if (step >= quizArqToday.length) {
+    const scores = Array(12).fill(0);
+    quizArqAnswers.forEach((ans,i)=>{ if(ans>=0) scores[quizArqToday[i].scores[ans]] += 2; });
+    const topIdx = scores.reduce((best,v,i)=>v>scores[best]?i:best,0);
+    const a = ARCHETYPES[topIdx];
+    c.innerHTML = `<div class="quiz-result" style="display:block">
+      <div class="quiz-result-glyph">${a.glyph}</div>
+      <div class="quiz-result-title">${a.name}</div>
+      <p class="quiz-result-desc">${a.desc}</p>
+      <p style="font-size:.82rem;color:var(--text3);margin-bottom:1.2rem;font-style:italic">Qualidades: ${a.qualities}</p>
+      <p style="font-size:.82rem;color:var(--text3);margin-bottom:1.5rem">Sombra: ${a.shadow}</p>
+      <button class="quiz-retry-btn" onclick="initQuizArq()">↺ Refazer</button>
+    </div>`;
+    return;
+  }
+  const q = quizArqToday[step];
+  c.innerHTML = `<p style="font-size:.78rem;color:var(--text3);margin-bottom:.8rem">${step+1} / ${quizArqToday.length}</p>
+    <p class="quiz-question">${q.q}</p>
+    <div class="quiz-options" id="quiz-arq-opts">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="selectQuizArq(${i},this)">${o}</button>`).join('')}
+    </div>
+    <button class="quiz-next-btn" style="display:none;margin-top:.5rem" id="quiz-arq-next" onclick="nextQuizArq()">Próxima →</button>`;
+}
+function selectQuizArq(i, btn) {
+  document.querySelectorAll('#quiz-arq-opts .quiz-opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  quizArqTmpAns = i;
+  document.getElementById('quiz-arq-next').style.display = '';
+}
+function nextQuizArq() {
+  if (quizArqTmpAns < 0) return;
+  quizArqAnswers[quizArqStep] = quizArqTmpAns;
+  renderQuizArq(quizArqStep + 1);
+}
+
+// ===== QUIZ FIL =====
+let quizFilToday = [];
+function initQuizFil() {
+  quizFilStep = 0;
+  quizFilToday = getTodayQuizFil();
+  renderQuizFil(0);
+}
+function renderQuizFil(step) {
+  const c = document.getElementById('quiz-fil-container');
+  const q = quizFilToday[step];
+  c.innerHTML = `<p style="font-size:.78rem;color:var(--text3);margin-bottom:.8rem">${step+1} / ${quizFilToday.length}</p>
+    <p class="quiz-question">${q.q}</p>
+    <div class="quiz-options">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="selectQuizFil(${i},${step},this)">${o}</button>`).join('')}
+    </div>
+    <div id="quiz-fil-answer" style="display:none;margin-top:1rem;padding:.8rem;background:rgba(201,150,58,.05);border:1px solid var(--line);border-radius:3px;font-size:.9rem;color:var(--text2);line-height:1.7"></div>
+    <button class="quiz-next-btn" style="display:none;margin-top:.8rem" id="quiz-fil-next" onclick="nextQuizFil(${step})">
+      ${step < quizFilToday.length-1 ? 'Próxima →' : 'Recomeçar'}
+    </button>`;
+}
+function selectQuizFil(i, step, btn) {
+  document.querySelectorAll('#quiz-fil-container .quiz-opt').forEach(b=>{b.classList.remove('selected');b.disabled=true});
+  btn.classList.add('selected');
+  document.getElementById('quiz-fil-answer').style.display='';
+  document.getElementById('quiz-fil-answer').textContent = quizFilToday[step].resp[i];
+  document.getElementById('quiz-fil-next').style.display='';
+}
+function nextQuizFil(step) {
+  if (step < quizFilToday.length-1) renderQuizFil(step+1);
+  else initQuizFil();
+}
+
+// ===== ESPELHO =====
+function initEspelho() { espelhoAnswers = []; espelhoStep = 0; renderEspelho(0); }
+function renderEspelho(step) {
+  const c = document.getElementById('espelho-container');
+  if (step >= ESPELHO_QS.length) {
+    const key = espelhoAnswers.map((a,i)=>ESPELHO_QS[i].keys[a]).join('-');
+    const result = ESPELHO_RESULTS[key] || ESPELHO_RESULTS.default;
+    c.innerHTML = `<div style="padding:1.5rem;background:rgba(201,150,58,.04);border:1px solid var(--amber);border-radius:4px;text-align:center">
+      <p style="font-size:.8rem;color:var(--amber);letter-spacing:.12em;margin-bottom:.8rem">O ESPELHO VIU ISTO</p>
+      <p style="font-size:1.05rem;color:var(--text2);line-height:1.85;font-style:italic">${result}</p>
+      <div style="margin-top:1.5rem;display:flex;gap:.8rem;justify-content:center">
+        <button class="quiz-retry-btn" onclick="initEspelho()">↺ Refazer</button>
+        <button onclick="openModal('modal-manifesto')" style="background:transparent;border:1px solid var(--amber);color:var(--amber2);padding:.5rem 1.2rem;font-family:'EB Garamond',serif;cursor:pointer;border-radius:2px;font-size:.88rem;transition:all .3s">Ir às Escrituras</button>
+      </div>
+    </div>`;
+    return;
+  }
+  const q = ESPELHO_QS[step];
+  c.innerHTML = `<p style="font-size:.78rem;color:var(--text3);margin-bottom:.8rem">${step+1} / ${ESPELHO_QS.length}</p>
+    <p class="quiz-question">${q.q}</p>
+    <div class="quiz-options">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="pickEspelho(${i},${step},this)"><span style="color:var(--amber);margin-right:.5rem">${['◈','◌','◎','◇'][i]}</span>${o}</button>`).join('')}
+    </div>`;
+}
+function pickEspelho(i, step, btn) {
+  document.querySelectorAll('#espelho-container .quiz-opt').forEach(b=>{b.classList.remove('selected');b.disabled=true});
+  btn.classList.add('selected');
+  espelhoAnswers[step] = i;
+  setTimeout(()=>renderEspelho(step+1), 350);
+}
+
+// ===== MODALS =====
+function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; }
+
+// ===== ACCORDION =====
+function toggleAcc(header) {
+  const acc = header.closest('.accordion');
+  acc.classList.toggle('open');
+}
+
+// ===== DISQUS =====
+function loadDisqus() {
+  var disqus_config = function () {
+    this.page.url = 'https://conhecendo-o-social-autonomismo.vercel.app/';
+    this.page.identifier = 'social-autonomista-relatos';
+  };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://social-autonomista.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+  // count.js para contagem de comentários
+  var cs = document.createElement('script');
+  cs.id = 'dsq-count-scr';
+  cs.src = '//social-autonomista.disqus.com/count.js';
+  cs.async = true;
+  document.head.appendChild(cs);
+}
+</script>
+</body>
+</html>
