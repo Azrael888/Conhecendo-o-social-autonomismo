@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://conhecendo-o-social-autonomismo.vercel.app/sitemap.xml

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- PÁGINA PRINCIPAL -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- PORTAL — Camada 1 -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#layer1</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ESCRITURAS — Camada 2 -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#layer2</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- PRÁTICA — Camada 3 -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#layer3</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- BIBLIOTECA -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#portal-biblioteca</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- QUIZ DO ARQUÉTIPO -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#portal-quiz-arq</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- CARTAS DOS ARQUÉTIPOS -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#portal-cards</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- MEDITAÇÃO -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#portal-med</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- O ESPELHO -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#portal-esp</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- COMENTÁRIOS -->
+  <url>
+    <loc>https://conhecendo-o-social-autonomismo.vercel.app/#comentarios</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>
