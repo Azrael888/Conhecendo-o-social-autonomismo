@@ -5,10 +5,16 @@
  * Camada 2: sabedoria coletiva — temas recorrentes da comunidade (Upstash Redis)
  * Camada 3: memória pessoal na nuvem (Upstash Redis, chave por UUID anônimo)
  *
- * Env vars necessárias no Vercel:
- *   GEMINI_API_KEY      — mesma do /api/gemini existente
- *   UPSTASH_REDIS_URL   — URL REST do Redis Upstash
- *   UPSTASH_REDIS_TOKEN — Token do Redis Upstash
+ * As respostas são geradas pelo Groq.
+ *
+ * Env vars no Vercel:
+ *   GROQ_API_KEY         — obrigatória
+ *   GROQ_MODEL           — opcional: modelo principal. Padrão: openai/gpt-oss-120b
+ *   GROQ_FALLBACK_MODEL  — opcional: modelo reserva se o principal for desligado. Padrão: qwen/qwen3.6-27b
+ *   UPSTASH_REDIS_URL    — URL REST do Redis Upstash (opcional; sem ela não há memória na nuvem)
+ *   UPSTASH_REDIS_TOKEN  — Token do Redis Upstash
+ *
+ * Lista de modelos e datas de desligamento: https://console.groq.com/docs/deprecations
  */
 
 // ─── Knowledge base do movimento (extraído do site profundo) ─────────────────
@@ -154,6 +160,8 @@ Você tem conhecimento profundo e completo do movimento — sua filosofia, prát
 
 Responda em português. Seja conciso, profundo e um pouco poético — como o próprio movimento. Não use markdown pesado (sem ** # ---). Máximo 3 parágrafos por resposta. Quando pertinente, conecte a pergunta a alguma das vértebras, arquétipos ou raízes culturais do movimento.
 
+Se a pessoa falar em suicídio, em se machucar, em abuso ou em risco imediato, deixe a poesia e o tom duro de lado: acolha com calma e simplicidade, diga que ela merece apoio de uma pessoa agora, indique o CVV (telefone 188, gratuito, 24 horas, ou chat em cvv.org.br/chat) e, se houver risco imediato, o SAMU (192). Não debata, não filosofe sobre isso e não minimize.
+
 ${MOVEMENT_KNOWLEDGE}`;
 
 // ─── Upstash REST client (sem SDK, zero dependências) ────────────────────────
@@ -201,17 +209,33 @@ function extrairTemas(text) {
 }
 
 // ─── Memória pessoal na nuvem ─────────────────────────────────────────────────
+// Lembranças antigas guardavam o começo da mensagem; agora só a etiqueta genérica.
+function normalizarMemoria(m) {
+  const s = String(m);
+  return s.startsWith('expressou dificuldade') ? 'expressou dificuldade' : s.slice(0, 200);
+}
+
 async function lerMemoria(uuid) {
   if (!uuid) return [];
   const raw = await redis('GET', `oracle:mem:${uuid}`);
-  try { return JSON.parse(raw) || []; } catch { return []; }
+  try {
+    const arr = JSON.parse(raw) || [];
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string').map(normalizarMemoria) : [];
+  } catch { return []; }
 }
 
-async function salvarMemoria(uuid, fragmentos) {
+async function salvarMemoria(uuid, fragmentos, atualConhecida) {
   if (!uuid || !fragmentos.length) return;
-  const atual = await lerMemoria(uuid);
-  const merged = [...new Set([...atual, ...fragmentos])].slice(-20);
+  const atual = Array.isArray(atualConhecida) ? atualConhecida : await lerMemoria(uuid);
+  const merged = [...new Set([...atual, ...fragmentos].map(normalizarMemoria))].slice(-20);
   await redisSet(`oracle:mem:${uuid}`, JSON.stringify(merged), 60 * 60 * 24 * 90);
+}
+
+// Apaga a memória na nuvem deste aparelho. Sem Redis configurado não há nada guardado.
+async function esquecerMemoria(uuid) {
+  if (!process.env.UPSTASH_REDIS_URL || !process.env.UPSTASH_REDIS_TOKEN) return true;
+  const r = await redis('DEL', `oracle:mem:${uuid}`);
+  return r !== null;
 }
 
 // ─── Sabedoria coletiva ───────────────────────────────────────────────────────
@@ -226,111 +250,4 @@ async function registrarTemas(temas) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(pipeline),
-      signal: AbortSignal.timeout(3000)
-    });
-  } catch {}
-}
-
-async function lerTemasColetivos() {
-  const raw = await redis('ZREVRANGE', 'oracle:temas', '0', '4', 'WITHSCORES');
-  if (!Array.isArray(raw)) return [];
-  const temas = [];
-  for (let i = 0; i < raw.length; i += 2) temas.push(raw[i]);
-  return temas;
-}
-
-// ─── Extrair fragmentos de memória da conversa ───────────────────────────────
-function extrairFragmentos(userMsg) {
-  const fragments = [];
-  const msg = userMsg.toLowerCase();
-
-  if (/quero.*círculo|formar.*círculo|começar.*círculo|primeiro círculo/.test(msg))
-    fragments.push('quer formar um círculo');
-  if (/difícil|dificuldade|não consigo|não sei como/.test(msg))
-    fragments.push('expressou dificuldade: ' + userMsg.slice(0, 60));
-  const arqMatch = msg.match(/sou (fogo|lua|sol|raiz|vento|água|pedra|semente|espelho|alquimista|guardião|profeta|mediador|herético|semeador|vidente|trovador|guardador|lunar|solar|navegador)/);
-  if (arqMatch) fragments.push(`arquétipo autodeclarado: ${arqMatch[1]}`);
-  const nomeMatch = userMsg.match(/me chamo ([A-ZÀ-Úa-zà-ú]+)|meu nome é ([A-ZÀ-Úa-zà-ú]+)/i);
-  if (nomeMatch) fragments.push(`nome: ${nomeMatch[1] || nomeMatch[2]}`);
-
-  return fragments;
-}
-
-// ─── Handler principal ────────────────────────────────────────────────────────
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const { contents, uuid, userMemory } = req.body || {};
-  if (!contents?.length) return res.status(400).json({ error: 'contents required' });
-
-  const lastUserMsg = [...contents].reverse().find(m => m.role === 'user')?.parts?.[0]?.text || '';
-  const temasMsg = extrairTemas(lastUserMsg);
-
-  // Processar Redis em paralelo
-  const [memoriaCloud, temasColetivos] = await Promise.all([
-    lerMemoria(uuid),
-    lerTemasColetivos(),
-    registrarTemas(temasMsg)
-  ]);
-
-  // Montar system prompt final
-  let system = ORACLE_SYSTEM_BASE;
-
-  const todasMemorias = [...new Set([...(userMemory || []), ...memoriaCloud])];
-  if (todasMemorias.length) {
-    system += `\n\n--- Contexto deste visitante ---\n${todasMemorias.map(m => `• ${m}`).join('\n')}`;
-  }
-
-  if (temasColetivos.length) {
-    system += `\n\n--- Temas que a comunidade mais explora ---\n${temasColetivos.map(t => `• ${t}`).join('\n')}\nSe pertinente, traga esses temas à conversa de forma natural.`;
-  }
-
-  // Salvar fragmentos de memória desta troca (fire-and-forget)
-  const novosFragmentos = extrairFragmentos(lastUserMsg);
-  if (uuid && novosFragmentos.length) salvarMemoria(uuid, novosFragmentos);
-
-  // Converter histórico do formato Gemini (role/parts) para Groq (role/content)
-  const groqMessages = [
-    { role: 'system', content: system },
-    ...contents.map(m => ({
-      role: m.role === 'model' ? 'assistant' : 'user',
-      content: m.parts?.[0]?.text || ''
-    }))
-  ];
-
-  // Chamar Groq
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY não configurada' });
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-
-  try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: groqMessages,
-        max_tokens: 600,
-        temperature: 0.85
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timer);
-
-    const data = await groqRes.json();
-    const text = data?.choices?.[0]?.message?.content;
-    if (!text) return res.status(500).json({ error: data?.error?.message || 'Sem resposta do Groq' });
-
-    return res.status(200).json({ text });
-
-  } catch (err) {
-    clearTimeout(timer);
-    if (err.name === 'AbortError') return res.status(504).json({ error: 'Timeout' });
-    return res.status(500).json({ error: err.message });
-  }
-}
+   
